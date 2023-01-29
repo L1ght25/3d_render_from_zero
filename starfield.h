@@ -49,10 +49,10 @@ public:
             if (!field.IsInsideMap(x, y)) {
                 InitStar(star);
 //                field.ClearBuffer();
-                dots.push_back({star.x, star.y});
+//                dots.push_back({star.x, star.y});
             } else {
 //                field.SetPixel(x, y, 255, 255 * star.z, 255, 255 * star.z);
-                    dots.push_back({star.x / (star.z * tan_of_view_), star.y / (star.z * tan_of_view_)});
+//                    dots.push_back({star.x / (star.z * tan_of_view_), star.y / (star.z * tan_of_view_)});
             }
 //            dots.push_back({static_cast<double>(x), static_cast<double>(y)});
 //            dots.push_back({x, y});

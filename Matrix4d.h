@@ -93,6 +93,26 @@ public:
         return std::move(new_matrix);
     }
 
+    Matrix operator*(double alpha) const {
+        Matrix new_matrix(h_, w_);
+        for (size_t i = 0; i < h_; ++i) {
+            for (size_t j = 0; j < w_; ++j) {
+                new_matrix(i, j) = matrix_[i][j] * alpha;
+            }
+        }
+        return new_matrix;
+    }
+
+    Matrix& operator+=(const Matrix<T>& another) {
+        Check(*this, another);
+        for (size_t i = 0; i < h_; ++i) {
+            for (size_t j = 0; j < w_; ++j) {
+                matrix_[i][j] += another(i, j);
+            }
+        }
+        return *this;
+    }
+
     static void Check(const Matrix<T>& matrix_1, const Matrix<T>& matrix_2) {
         if (matrix_1.h_ != matrix_2.h_ or matrix_1.w_ != matrix_2.w_) {
             throw std::runtime_error("invalid operation length");

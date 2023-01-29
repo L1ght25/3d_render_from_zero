@@ -3,6 +3,7 @@
 
 class Vector4d : public Matrix4d {
 public:
+    Vector4d() = default;
     Vector4d(double x, double y, double z, double w) : Matrix4d{{x}, {y}, {z}, {w}} {
 
     }
@@ -33,6 +34,14 @@ public:
         return Mut(oper, *this);
 //        return Vector4d{oper * (*dynamic_cast<const Matrix<double>*>(this))};
     }
+
+    Vector4d operator*(double alpha) const {
+        return {GetX() * alpha, GetY() * alpha, GetZ() * alpha, GetW() * alpha};
+    }
+
+//    Vector4d& operator+=(const Vector4d& other) {
+//        matrix_ += other.matrix_;
+//    }
 
     friend class Vertex;
 };

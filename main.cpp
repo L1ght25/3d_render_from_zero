@@ -17,9 +17,9 @@ int main() {
 
     RenderContext my_second_map(WIDTH, HEIGHT);
 
-    Vertex first{-1, 1};
-    Vertex second{0, -1.5};
-    Vertex third{1, 1};
+    Vertex first{-1, 1, 0, {1, 1, 0, 0}};
+    Vertex second{0, -1.5, 0, {0, 1, 1, 0}};
+    Vertex third{1, 1, 0, {1, 0, 1, 0}};
 
     Matrix4d projection = Matrix4d().InitPerspective(radToDeg(double(90)), (double)WIDTH / HEIGHT, 0.1, 1000.0);
     auto translation = Matrix4d().InitTranslationOperator(0, 0, 3);
