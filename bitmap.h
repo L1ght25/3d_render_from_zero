@@ -21,6 +21,11 @@ public:
         pixels_[ind + 3] = a;
     }
 
+    void CopyPixel(const Bitmap& map, int cur_x, int cur_y, int x, int y) {
+        int ind = (x + y * map.width_) * 4;
+        SetPixel(cur_x, cur_y, map.pixels_[ind], map.pixels_[ind + 1], map.pixels_[ind + 2], map.pixels_[ind + 3]);
+    }
+
     auto GetPointerToPixels() -> const sf::Uint8* {
         return pixels_.data();
     }

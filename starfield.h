@@ -59,7 +59,7 @@ public:
         }
 //        int y_min = std::min({dots[0].GetY(), dots[1].GetY(), dots[2].GetY()});
 //        int y_max = std::max({dots[0].GetY(), dots[1].GetY(), dots[2].GetY()}) + 1;
-        field.FillTriangle(dots[0], dots[1], dots[2]);
+//        field.FillTriangle(dots[0], dots[1], dots[2]);
 //        field.FillPixels(y_min, y_max);
 //        field.ClearBuffer();
     }
