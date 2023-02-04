@@ -29,9 +29,6 @@ int main() {
         }
     }
     Object3d my_first_model("../models/SimpleCube.obj");
-//    Vertex first{-1, 1, 0, {1, 1, 0, 0}};
-//    Vertex second{0, -1.5, 0, {0, 1, 0, 0}};
-//    Vertex third{1, 1, 0, {1, 0, 0, 0}};
 
     Matrix4d projection = Matrix4d().InitPerspective(radToDeg(double(90)), (double)WIDTH / (HEIGHT), 0.1, 1000.0);
     auto translation = Matrix4d().InitTranslationOperator(0, 0, 3);
@@ -63,7 +60,6 @@ int main() {
         my_second_map.Fill(0);
         my_second_map.ClearZBuffer();
         my_second_map.DrawModel(my_first_model, transformer, my_texture);
-//        my_second_map.FillTriangle(first.Transform(transformer), second.Transform(transformer), third.Transform(transformer), my_texture);
         prev_time = curr_time;
         texture.update(my_second_map.GetPointerToPixels());
 
