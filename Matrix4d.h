@@ -32,6 +32,10 @@ public:
     Matrix(size_t h, size_t w) : matrix_(h, std::vector<T>(w)), h_(h), w_(w) {
     }
 
+    Matrix(std::vector<std::vector<double>> vec) : matrix_(std::move(vec)), h_(vec.size()), w_(vec[0].size()) {
+
+    }
+
     Matrix(std::initializer_list<std::initializer_list<T>> matrix) : h_(matrix.size()) {
         matrix_.reserve(h_);
         for (auto&& vec : matrix) {
@@ -82,7 +86,7 @@ public:
         return std::move(new_matrix);
     }
 
-    Matrix operator-(const Matrix<T>& matrix_2) {
+    Matrix operator-(const Matrix<T>& matrix_2) const {
         Check(*this, matrix_2);
         Matrix new_matrix(h_, w_);
         for (size_t i = 0; i < h_; ++i) {
@@ -237,6 +241,10 @@ class Matrix4d : public Matrix<double> {
 
             }
 
+            Matrix4d(const std::vector<std::vector<double>>& vec) : Matrix<double>(vec) {
+
+            }
+
             Matrix4d(const Matrix<double>& another) : Matrix<double>(another) {
 
             }
@@ -278,6 +286,34 @@ class Matrix4d : public Matrix<double> {
                 matrix_[2][0] = x * z * cos_inv - y * sin_alpha;
                 matrix_[2][1] = y * z * cos_inv + x * sin_alpha;
                 matrix_[2][2] = cos_alpha + z * z * cos_inv;
+                matrix_[3][3] = 1;
+                return *this;
+            }
+
+            Matrix4d& InitRotation(double x, double y, double z) {  // композиция поворотов вокруг осей
+                std::vector<std::vector<double>>rotate_x(4, std::vector<double>(4));
+                std::vector<std::vector<double>>rotate_y(4, std::vector<double>(4));
+                std::vector<std::vector<double>>rotate_z(4, std::vector<double>(4));
+
+                rotate_x[0][0] = 1;
+                rotate_x[1][1] = cos(x);
+                rotate_x[1][2] = -sin(x);
+                rotate_x[2][1] = sin(x);
+                rotate_x[2][2] = cos(x);
+
+                rotate_y[1][1] = 1;
+                rotate_y[0][0] = cos(y);
+                rotate_y[0][2] = sin(y);
+                rotate_y[2][0] = -sin(y);
+                rotate_y[2][2] = cos(y);
+
+                rotate_z[2][2] = 1;
+                rotate_z[0][0] = cos(z);
+                rotate_z[0][1] = -sin(z);
+                rotate_z[1][0] = sin(z);
+                rotate_z[1][1] = cos(z);
+
+                *this = std::move(Matrix4d(rotate_z) * Matrix4d(rotate_y) * Matrix4d(rotate_x));
                 matrix_[3][3] = 1;
                 return *this;
             }
