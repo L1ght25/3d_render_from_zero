@@ -38,7 +38,7 @@ public:
         return height_;
     }
 
-    bool IsInsideMap(int x, int y) {
+    bool IsInsideMap(int x, int y) const {
         return 0 <= x and x < width_ and 0 <= y and y < height_;
     }
 

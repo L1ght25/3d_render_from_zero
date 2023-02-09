@@ -41,6 +41,10 @@ public:
         return pos_.GetZ();
     }
 
+    double GetW() const {
+        return pos_.GetW();
+    }
+
     const Vector4d& GetPos() const {
         return pos_;
     }
@@ -70,12 +74,23 @@ class Gradients {
 public:
     Gradients(const Vertex& min_y_v, const Vertex& mid_y_v, const Vertex& max_y_v) :
             texture_pos_{min_y_v.GetTexturePos(), mid_y_v.GetTexturePos(), max_y_v.GetTexturePos()},
-            depth_(min_y_v.GetZ(), mid_y_v.GetZ(), max_y_v.GetZ(), 0) {
+            depth_(min_y_v.GetZ(), mid_y_v.GetZ(), max_y_v.GetZ(), 0),
+            one_over_z_(1.f / min_y_v.GetW(), 1.f / mid_y_v.GetW(), 1.f / max_y_v.GetW(), 0) {
         double dX = (mid_y_v.GetX() - max_y_v.GetX()) * (min_y_v.GetY() - max_y_v.GetY()) -
                     (min_y_v.GetX() - max_y_v.GetX()) * (mid_y_v.GetY() - max_y_v.GetY());
         double dY = -dX;
+        z_step_(0, 0) = ((one_over_z_(1, 0) - one_over_z_(2, 0)) * (min_y_v.GetY() - max_y_v.GetY()) -
+                         (one_over_z_(0, 0) - one_over_z_(2, 0)) * (mid_y_v.GetY() - max_y_v.GetY())) * (1.f / dX);
+
+        z_step_(1, 0) = ((one_over_z_(1, 0) - one_over_z_(2, 0)) * (min_y_v.GetX() - max_y_v.GetX()) -
+                         (one_over_z_(0, 0) - one_over_z_(2, 0)) * (mid_y_v.GetX() - max_y_v.GetX())) * (1.f / dY);
+
+        for (size_t i = 0; i < 3; ++i) {
+                texture_pos_[i] = texture_pos_[i] * one_over_z_(i, 0);
+        }
         x_step_ = calc_step(texture_pos_, min_y_v, mid_y_v, max_y_v, dX, true);
         y_step_ = calc_step(texture_pos_, min_y_v, mid_y_v, max_y_v, dY, false);
+
         depth_step_(0, 0) = ((depth_(1, 0) - depth_(2, 0)) * (min_y_v.GetY() - max_y_v.GetY()) -
                              (depth_(0, 0) - depth_(2, 0)) * (mid_y_v.GetY() - max_y_v.GetY())) * (1.f / dX);
         depth_step_(1, 0) = ((depth_(1, 0) - depth_(2, 0)) * (min_y_v.GetX() - max_y_v.GetX()) -
@@ -90,12 +105,24 @@ public:
         return depth_(pos, 0);
     }
 
+    double GetOneOverZPos(int pos) const {
+        return one_over_z_(pos, 0);
+    }
+
     double GetDepthStepX() const {
         return depth_step_(0, 0);
     }
 
     double GetDepthStepY() const {
         return depth_step_(1, 0);
+    }
+
+    double GetOneOverZX() const {
+        return z_step_(0, 0);
+    }
+
+    double GetOneOverZY() const {
+        return z_step_(1, 0);
     }
 
     const Vector4d& GetXStep() const {
@@ -122,6 +149,9 @@ private:
     Vector4d y_step_;
     Vector4d depth_;
     Vector4d depth_step_;
+
+    Vector4d one_over_z_;
+    Vector4d z_step_;
 };
 
 class Edge {
@@ -130,18 +160,25 @@ public:
             y_start_(std::ceil(first.GetY())), y_end_(std::ceil(second.GetY())),
             x_step_((first.GetX() - second.GetX()) / (first.GetY() - second.GetY())),
             cur_x_(std::ceil(first.GetX()) + x_step_ * (std::ceil(first.GetY()) - first.GetY())),
+
             cur_texture_pos_(grad.GetTexPos(ind_of_min_v_color) + grad.GetYStep() * (std::ceil(first.GetY()) - first.GetY())
             + grad.GetXStep() * (cur_x_ - first.GetX())),
             texture_pos_step_(grad.GetYStep() + grad.GetXStep() * x_step_),
+
             cur_depth_(grad.GetDepthPos(ind_of_min_v_color) + grad.GetDepthStepY() *
             (std::ceil(first.GetY()) - first.GetY()) + grad.GetDepthStepX() * (cur_x_ - first.GetX())),
-            depth_step_(grad.GetDepthStepY() + grad.GetDepthStepX() * x_step_) {
+            depth_step_(grad.GetDepthStepY() + grad.GetDepthStepX() * x_step_),
+
+            cur_one_over_z_(grad.GetOneOverZPos(ind_of_min_v_color) + grad.GetOneOverZY() *
+            (std::ceil(first.GetY()) - first.GetY()) + grad.GetOneOverZX() * (cur_x_ - first.GetX())),
+            cur_z_step_(grad.GetOneOverZY() + grad.GetOneOverZX() * x_step_) {
     }
 
     void Step() {
         cur_x_ += x_step_;
         cur_texture_pos_ += texture_pos_step_;
         cur_depth_ += depth_step_;
+        cur_one_over_z_ += cur_z_step_;
     }
 
     const Vector4d& GetTexturePos() const {
@@ -164,6 +201,10 @@ public:
         return cur_depth_;
     }
 
+    double GetOneOverZ() const {
+        return cur_one_over_z_;
+    }
+
 private:
     int y_start_;
     int y_end_;
@@ -175,7 +216,16 @@ private:
 
     double cur_depth_;
     double depth_step_;
+
+    double cur_one_over_z_;
+    double cur_z_step_;
 };
+
+unsigned int countWordsInString(std::string const& str)
+{
+    std::stringstream stream(str);
+    return std::distance(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>());
+}
 
 class Object3d {
 public:
@@ -201,18 +251,33 @@ public:
                     texture_coords_.emplace_back(x, y, 0, 0);
                 }
             } else if(curr_line.starts_with("f ")) {
-                int a, b, c;  // vertices
-                int A, B, C;  // texture
-                int AA, BB, CC; // ignore for good times
-                const char *curr_str = curr_line.c_str();
-                sscanf(curr_str, "f %i/%i/%i %i/%i/%i %i/%i/%i", &a, &A, &AA, &b, &B, &BB, &c, &C, &CC);
-                --a, --b, --c, --A, --B, --C;
+                int a, b, c, d = -2;  // vertices
+                int A, B, C, D = -2;  // texture
+                int AA, BB, CC, DD = -2; // ignore for good times
+                if (countWordsInString(curr_line) == 5) {
+                    sscanf(curr_line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i %i/%i/%i",
+                           &a, &A, &AA,
+                           &b, &B, &BB,
+                           &c, &C, &CC,
+                           &d, &D, &DD);
+                } else {
+                    sscanf(curr_line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i", &a, &A, &AA, &b, &B, &BB, &c, &C, &CC);
+                }
+                --a, --b, --c, --d, --A, --B, --C, --D;
                 indexes_.push_back(a);
                 indexes_.push_back(b);
                 indexes_.push_back(c);
+                if (d > -1) {
+                    indexes_.push_back(a);
+                    indexes_.push_back(c);
+                    indexes_.push_back(d);
+                }
                 vertices_[a].SetTexturePos(texture_coords_[A]);
                 vertices_[b].SetTexturePos(texture_coords_[B]);
                 vertices_[c].SetTexturePos(texture_coords_[C]);
+                if (D > -1) {
+                    vertices_[d].SetTexturePos(texture_coords_[D]);
+                }
             }
         }
     }
@@ -285,20 +350,26 @@ private:
 
     void DrawLeftRight(const Gradients& grad, Edge& left, Edge& right, int y_min, int y_max, const Bitmap& texture) {
         for (int y = y_min; y < y_max; ++y) {
-            Vector4d cur_texture_pos = left.GetTexturePos() + grad.GetXStep() * (std::ceil(left.GetX()) - left.GetX());
 
-//            double depth_step = (right.GetDepth() - left.GetDepth()) / (std::ceil(right.GetX()) - std::ceil(left.GetX()));
+            Vector4d cur_texture_pos = left.GetTexturePos() + grad.GetXStep() * (std::ceil(left.GetX()) - left.GetX());
             double cur_depth = left.GetDepth() + grad.GetDepthStepX() * (std::ceil(left.GetX()) - left.GetX());
+            double cur_one_over_z = left.GetOneOverZ() + grad.GetOneOverZX() * (std::ceil(left.GetX()) - left.GetX());
+            double cur_z_step = (right.GetOneOverZ() - left.GetOneOverZ()) / (right.GetX() - left.GetX());
+
             for (int x = std::ceil(left.GetX()); x < std::ceil(right.GetX()); ++x) {
                 int cur_ind = y * width_ + x;
                 if (cur_depth < z_buffer_[cur_ind]) {
                     z_buffer_[cur_ind] = cur_depth;
-                    int tex_x = std::round(cur_texture_pos.GetX() * (texture.Width() - 1));
-                    int tex_y = std::round(cur_texture_pos.GetY() * (texture.Height() - 1));
-                    CopyPixel(texture, x, y, tex_x, tex_y);
+                    double cur_z = 1.f / cur_one_over_z;
+                    int tex_x = std::round(cur_texture_pos.GetX() * cur_z * (texture.Width() - 1));
+                    int tex_y = std::round(cur_texture_pos.GetY() * cur_z * (texture.Height() - 1));
+                    if (texture.IsInsideMap(tex_x, tex_y)) {  // TODO: нормально отдежабить
+                        CopyPixel(texture, x, y, tex_x, tex_y);
+                    }
                 }
                 cur_texture_pos += grad.GetXStep();
                 cur_depth += grad.GetDepthStepX();
+                cur_one_over_z += cur_z_step;
             }
             left.Step();
             right.Step();
