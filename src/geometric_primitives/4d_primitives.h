@@ -33,34 +33,25 @@ class Vector4d final : public Matrix4d {
   public:
     Vector4d() = default;
 
-    Vector4d(double x, double y, double z, double w) : Matrix4d{{x}, {y}, {z}, {w}} {
-    }
+    Vector4d(double x, double y, double z, double w);
 
     Vector4d(const Matrix<double>& mat);
 
-    double GetX() const {
-        return matrix_[0][0];
-    }
+    double GetX() const;
 
-    double GetY() const {
-        return matrix_[1][0];
-    }
+    double GetY() const;
 
-    double GetZ() const {
-        return matrix_[2][0];
-    }
+    double GetZ() const;
 
-    double GetW() const {
-        return matrix_[3][0];
-    }
+    double GetW() const;
 
-    Vector4d Transform(const Matrix4d& oper) const {
-        return oper * (*this);
-    }
+    double operator[](size_t i) const;
 
-    Vector4d operator*(double alpha) const {
-        return {GetX() * alpha, GetY() * alpha, GetZ() * alpha, GetW() * alpha};
-    }
+    Vector4d Transform(const Matrix4d& oper) const;
+
+    Vector4d operator*(double alpha) const;
+
+    Vector4d LinearInterpolation(const Vector4d &another, const double& coef) const;
 
     friend class Vertex;
 };

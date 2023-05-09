@@ -19,8 +19,8 @@ geometry::Matrix4d& geometry::Matrix4d::InitScreenSpaceTransform(double half_hei
     InitIdentityOperator();
     matrix_[0][0] = half_width;
     matrix_[1][1] = -half_height;
-    matrix_[0][3] = half_width;
-    matrix_[1][3] = half_height;
+    matrix_[0][3] = half_width - 0.5;
+    matrix_[1][3] = half_height - 0.5;
     return *this;
 }
 
@@ -82,9 +82,44 @@ geometry::Matrix4d& geometry::Matrix4d::InitPerspective(double fov, double aspec
     return *this;
 }
 
+geometry::Vector4d::Vector4d(double x, double y, double z, double w) : Matrix4d{{x}, {y}, {z}, {w}} {
+    }
+
 geometry::Vector4d::Vector4d(const Matrix<double>& mat) : Matrix4d{{mat(0, 0)}, {mat(1, 0)}, {mat(2, 0)}, {mat(3, 0)}} {
     if (mat.Columns() != 1) {
         fprintf(stderr, "WARNING! Got size: (%zu, %zu)\n", mat.Rows(), mat.Columns());
         throw std::invalid_argument("Invalid input: is not vector");
     }
+}
+
+double geometry::Vector4d::GetX() const {
+    return matrix_[0][0];
+}
+
+double geometry::Vector4d::GetY() const {
+    return matrix_[1][0];
+}
+
+double geometry::Vector4d::GetZ() const {
+    return matrix_[2][0];
+}
+
+double geometry::Vector4d::GetW() const {
+    return matrix_[3][0];
+}
+
+double geometry::Vector4d::operator[](size_t i) const {
+    return matrix_[i][0];
+}
+
+geometry::Vector4d geometry::Vector4d::Transform(const Matrix4d& oper) const {
+    return oper * (*this);
+}
+
+geometry::Vector4d geometry::Vector4d::operator*(double alpha) const {
+    return {GetX() * alpha, GetY() * alpha, GetZ() * alpha, GetW() * alpha};
+}
+
+geometry::Vector4d geometry::Vector4d::LinearInterpolation(const Vector4d &another, const double& coef) const {
+    return *this + (another - *this) * coef;
 }

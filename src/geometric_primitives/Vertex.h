@@ -6,9 +6,9 @@ class Vertex {
   public:
     Vertex(double x, double y, double z);
 
-    Vertex(double x, double y, double z, Vector4d color);
+    Vertex(double x, double y, double z, Vector4d texture);
 
-    Vertex(Vector4d vec, Vector4d color);
+    Vertex(Vector4d vec, Vector4d texture);
 
     void SetTexturePos(Vector4d pos);
 
@@ -28,7 +28,11 @@ class Vertex {
 
     Vertex PerspectiveDivision();
 
+    Vertex LinearInterpolation(const Vertex& another, const double& coef) const;
+
     double SquareTriangleTwice(const Vertex& second_v, const Vertex& third_v) const;
+
+    bool IsInsideView() const;
 
   private:
     Vector4d pos_;
