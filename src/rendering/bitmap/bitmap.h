@@ -1,10 +1,10 @@
 #pragma once
-#include <vector>
 #include <SFML/Graphics/Export.hpp>
+#include <vector>
 
 namespace rendering {
 class Bitmap {
-public:
+  public:
     Bitmap(int width, int height);
 
     std::vector<sf::Uint8> Fill(sf::Uint8 color);
@@ -21,9 +21,9 @@ public:
 
     bool IsInsideMap(int x, int y) const;
 
-protected:
+  protected:
     int width_;
     int height_;
     std::vector<sf::Uint8> pixels_;
 };
-}
+}  // namespace rendering

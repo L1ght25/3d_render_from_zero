@@ -46,11 +46,16 @@ load::Object3d::Object3d(std::string_view filename) {
             }
             for (int i = 0; i < (has_4_dim ? 4 : 3); ++i) {
                 if (i == 3) {
+                    if (vertices[i] < 1) {
+                        break;
+                    }
                     indexes_.push_back(vertices[0]);
                     indexes_.push_back(vertices[2]);
                 }
                 indexes_.push_back(--vertices[i]);
-                vertices_[vertices[i]].SetTexturePos(texture_coords_[--texture[i]]);
+                if (texture[i] > 0) {
+                    vertices_[vertices[i]].SetTexturePos(texture_coords_[--texture[i]]);
+                }
             }
         }
     }

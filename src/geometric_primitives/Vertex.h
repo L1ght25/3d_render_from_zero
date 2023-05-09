@@ -3,7 +3,7 @@
 
 namespace geometry {
 class Vertex {
-public:
+  public:
     Vertex(double x, double y, double z);
 
     Vertex(double x, double y, double z, Vector4d color);
@@ -30,8 +30,8 @@ public:
 
     double SquareTriangleTwice(const Vertex& second_v, const Vertex& third_v) const;
 
-private:
+  private:
     Vector4d pos_;
     Vector4d texture_pos_;
 };
-}
+}  // namespace geometry

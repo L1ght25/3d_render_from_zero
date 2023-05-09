@@ -1,21 +1,19 @@
 #pragma once
 #include "MatrixBase.h"
+
 namespace geometry {
 class Matrix4d : public Matrix<double> {  // special matrix that is used in most operations in 3d-render
-public:
+  public:
     Matrix4d() : Matrix<double>(4, 4) {
     }
 
     Matrix4d(std::initializer_list<std::initializer_list<double>> matrix) : Matrix<double>(matrix) {
-
     }
 
     Matrix4d(std::vector<std::vector<double>>&& vec) noexcept : Matrix<double>(std::move(vec)) {
-
     }
 
     Matrix4d(const Matrix<double>& another) : Matrix<double>(another) {
-
     }
 
     Matrix4d& InitIdentityOperator();
@@ -31,12 +29,11 @@ public:
     Matrix4d& InitPerspective(double fov, double aspect, double z_near, double z_far);
 };
 
-
 class Vector4d final : public Matrix4d {
-public:
+  public:
     Vector4d() = default;
-    Vector4d(double x, double y, double z, double w) : Matrix4d{{x}, {y}, {z}, {w}} {
 
+    Vector4d(double x, double y, double z, double w) : Matrix4d{{x}, {y}, {z}, {w}} {
     }
 
     Vector4d(const Matrix<double>& mat);
@@ -67,4 +64,4 @@ public:
 
     friend class Vertex;
 };
-}
+}  // namespace geometry

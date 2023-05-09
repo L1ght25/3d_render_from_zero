@@ -1,14 +1,12 @@
 #include "RenderContext.h"
 
 rendering::RenderContext::RenderContext(int width, int height) : Bitmap(width, height), z_buffer_(width * height) {
-
 }
 
 void rendering::RenderContext::DrawModel(const Object3d& model, const Matrix4d& transform, const Bitmap& texture) {
     for (int i = 0; i < model.SizeOfPolygons(); i += 3) {
-        FillTriangle(model.GetVertexByInd(i).Transform(transform),
-                        model.GetVertexByInd(i + 1).Transform(transform),
-                        model.GetVertexByInd(i + 2).Transform(transform), texture);
+        FillTriangle(model.GetVertexByInd(i).Transform(transform), model.GetVertexByInd(i + 1).Transform(transform),
+                     model.GetVertexByInd(i + 2).Transform(transform), texture);
     }
 }
 
@@ -18,11 +16,10 @@ void rendering::RenderContext::FillTriangle(const Vertex& first_dot, const Verte
     auto second = second_dot.Transform(perspective).PerspectiveDivision();
     auto third = third_dot.Transform(perspective).PerspectiveDivision();
     std::vector<Vertex> sorted_dots = {first, second, third};
-    std::sort(sorted_dots.begin(), sorted_dots.end(),
-                [](const Vertex& first, const Vertex& second) { return first.GetY() <= second.GetY(); });
+    std::sort(sorted_dots.begin(), sorted_dots.end(), [](const Vertex& first, const Vertex& second) { return first.GetY() <= second.GetY(); });
     Gradients grad(sorted_dots[0], sorted_dots[1], sorted_dots[2]);
-    TriangleHandler(grad, sorted_dots[0], sorted_dots[1], sorted_dots[2],
-                    sorted_dots[0].SquareTriangleTwice(sorted_dots[2], sorted_dots[1]) >= 0, texture);
+    TriangleHandler(grad, sorted_dots[0], sorted_dots[1], sorted_dots[2], sorted_dots[0].SquareTriangleTwice(sorted_dots[2], sorted_dots[1]) >= 0,
+                    texture);
 }
 
 void rendering::RenderContext::ClearZBuffer() {
@@ -32,12 +29,12 @@ void rendering::RenderContext::ClearZBuffer() {
 }
 
 void rendering::RenderContext::TriangleHandler(const Gradients& grad, const Vertex& min_y_v, const Vertex& middle_y_v, const Vertex& max_y_v,
-                        bool is_positive_square, const Bitmap& texture) {
+                                               bool is_positive_square, const Bitmap& texture) {
     Edge max_to_min(grad, min_y_v, max_y_v, 0);
     Edge max_to_mid(grad, min_y_v, middle_y_v, 0);
     Edge mid_to_min(grad, middle_y_v, max_y_v, 1);
     EdgeScan(grad, &max_to_min, &max_to_mid, is_positive_square, texture);
-    EdgeScan(grad,&max_to_min, &mid_to_min, is_positive_square, texture);
+    EdgeScan(grad, &max_to_min, &mid_to_min, is_positive_square, texture);
 }
 
 void rendering::RenderContext::EdgeScan(const Gradients& grad, Edge* first, Edge* second, bool is_positive_square, const Bitmap& texture) {

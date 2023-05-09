@@ -1,21 +1,20 @@
 #include "Edge.h"
 
-rendering::Edge::Edge(const Gradients& grad, const Vertex& first, const Vertex& second, int ind_of_min_v_color) :
-    y_start_(std::ceil(first.GetY())), y_end_(std::ceil(second.GetY())),
-    x_step_((first.GetX() - second.GetX()) / (first.GetY() - second.GetY())),
-    cur_x_(std::ceil(first.GetX()) + x_step_ * (std::ceil(first.GetY()) - first.GetY())),
+rendering::Edge::Edge(const Gradients& grad, const Vertex& first, const Vertex& second, int ind_of_min_v_color)
+    : y_start_(std::ceil(first.GetY())), y_end_(std::ceil(second.GetY())), x_step_((first.GetX() - second.GetX()) / (first.GetY() - second.GetY())),
+      cur_x_(std::ceil(first.GetX()) + x_step_ * (std::ceil(first.GetY()) - first.GetY())),
 
-    cur_texture_pos_(grad.GetTexPos(ind_of_min_v_color) + grad.GetYStep() * (std::ceil(first.GetY()) - first.GetY())
-    + grad.GetXStep() * (cur_x_ - first.GetX())),
-    texture_pos_step_(grad.GetYStep() + grad.GetXStep() * x_step_),
+      cur_texture_pos_(grad.GetTexPos(ind_of_min_v_color) + grad.GetYStep() * (std::ceil(first.GetY()) - first.GetY()) +
+                       grad.GetXStep() * (cur_x_ - first.GetX())),
+      texture_pos_step_(grad.GetYStep() + grad.GetXStep() * x_step_),
 
-    cur_depth_(grad.GetDepthPos(ind_of_min_v_color) + grad.GetDepthStepY() *
-    (std::ceil(first.GetY()) - first.GetY()) + grad.GetDepthStepX() * (cur_x_ - first.GetX())),
-    depth_step_(grad.GetDepthStepY() + grad.GetDepthStepX() * x_step_),
+      cur_depth_(grad.GetDepthPos(ind_of_min_v_color) + grad.GetDepthStepY() * (std::ceil(first.GetY()) - first.GetY()) +
+                 grad.GetDepthStepX() * (cur_x_ - first.GetX())),
+      depth_step_(grad.GetDepthStepY() + grad.GetDepthStepX() * x_step_),
 
-    cur_one_over_z_(grad.GetOneOverZPos(ind_of_min_v_color) + grad.GetOneOverZY() *
-    (std::ceil(first.GetY()) - first.GetY()) + grad.GetOneOverZX() * (cur_x_ - first.GetX())),
-    cur_z_step_(grad.GetOneOverZY() + grad.GetOneOverZX() * x_step_) {
+      cur_one_over_z_(grad.GetOneOverZPos(ind_of_min_v_color) + grad.GetOneOverZY() * (std::ceil(first.GetY()) - first.GetY()) +
+                      grad.GetOneOverZX() * (cur_x_ - first.GetX())),
+      cur_z_step_(grad.GetOneOverZY() + grad.GetOneOverZX() * x_step_) {
 }
 
 void rendering::Edge::Step() {

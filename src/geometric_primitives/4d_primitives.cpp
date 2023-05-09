@@ -16,13 +16,13 @@ geometry::Matrix4d& geometry::Matrix4d::InitTranslationOperator(double x, double
 }
 
 geometry::Matrix4d& geometry::Matrix4d::InitScreenSpaceTransform(double half_height, double half_width) {
-        InitIdentityOperator();
-        matrix_[0][0] = half_width;
-        matrix_[1][1] = -half_height;
-        matrix_[0][3] = half_width;
-        matrix_[1][3] = half_height;
-        return *this;
-    }
+    InitIdentityOperator();
+    matrix_[0][0] = half_width;
+    matrix_[1][1] = -half_height;
+    matrix_[0][3] = half_width;
+    matrix_[1][3] = half_height;
+    return *this;
+}
 
 geometry::Matrix4d& geometry::Matrix4d::InitRotation(double x, double y, double z, double alpha) {  // поворот вокруг произвольной оси
     double sin_alpha = std::sin(alpha);
@@ -42,9 +42,9 @@ geometry::Matrix4d& geometry::Matrix4d::InitRotation(double x, double y, double 
 }
 
 geometry::Matrix4d& geometry::Matrix4d::InitRotation(double x, double y, double z) {  // композиция поворотов вокруг осей
-    std::vector<std::vector<double>>rotate_x(4, std::vector<double>(4));
-    std::vector<std::vector<double>>rotate_y(4, std::vector<double>(4));
-    std::vector<std::vector<double>>rotate_z(4, std::vector<double>(4));
+    std::vector<std::vector<double>> rotate_x(4, std::vector<double>(4));
+    std::vector<std::vector<double>> rotate_y(4, std::vector<double>(4));
+    std::vector<std::vector<double>> rotate_z(4, std::vector<double>(4));
 
     rotate_x[0][0] = 1;
     rotate_x[1][1] = cos(x);
@@ -75,7 +75,7 @@ geometry::Matrix4d& geometry::Matrix4d::InitPerspective(double fov, double aspec
 
     matrix_[0][0] = (double)1 / (tan_half * aspect);
     matrix_[1][1] = (double)1 / tan_half;
-    matrix_[2][2] = - (z_near + z_far) / z_range;
+    matrix_[2][2] = -(z_near + z_far) / z_range;
     matrix_[2][3] = 2 * z_far * z_near / z_range;
     matrix_[3][2] = 1;
 
@@ -88,4 +88,3 @@ geometry::Vector4d::Vector4d(const Matrix<double>& mat) : Matrix4d{{mat(0, 0)}, 
         throw std::invalid_argument("Invalid input: is not vector");
     }
 }
-

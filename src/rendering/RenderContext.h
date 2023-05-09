@@ -1,27 +1,26 @@
 #pragma once
+#include <fstream>
+#include <limits>
+#include <sstream>
+#include <string_view>
 #include <utility>
 #include <vector>
-#include <string_view>
-#include <fstream>
-#include <sstream>
-#include <limits>
 
-#include "bitmap/bitmap.h"
 #include "../geometric_primitives/4d_primitives.h"
 #include "../geometric_primitives/Vertex.h"
 #include "../load_models/Object3d.h"
-#include "rendering_helpers/Gradients.h"
+#include "bitmap/bitmap.h"
 #include "rendering_helpers/Edge.h"
+#include "rendering_helpers/Gradients.h"
 
 namespace rendering {
 class RenderContext : public Bitmap {
-public:
-
-using Vertex = geometry::Vertex;
-using Matrix4d = geometry::Matrix4d;
-using Gradients = rendering::Gradients;
-using Edge = rendering::Edge;
-using Object3d = load::Object3d;
+  public:
+    using Vertex = geometry::Vertex;
+    using Matrix4d = geometry::Matrix4d;
+    using Gradients = rendering::Gradients;
+    using Edge = rendering::Edge;
+    using Object3d = load::Object3d;
 
     RenderContext(int width, int height);
 
@@ -31,10 +30,9 @@ using Object3d = load::Object3d;
 
     void ClearZBuffer();
 
-private:
-
-    void TriangleHandler(const Gradients& grad, const Vertex& min_y_v, const Vertex& middle_y_v, const Vertex& max_y_v,
-                         bool is_positive_square, const Bitmap& texture);
+  private:
+    void TriangleHandler(const Gradients& grad, const Vertex& min_y_v, const Vertex& middle_y_v, const Vertex& max_y_v, bool is_positive_square,
+                         const Bitmap& texture);
 
     void EdgeScan(const Gradients& grad, Edge* first, Edge* second, bool is_positive_square, const Bitmap& texture);
 
@@ -42,4 +40,4 @@ private:
 
     std::vector<double> z_buffer_;
 };
-}
+}  // namespace rendering

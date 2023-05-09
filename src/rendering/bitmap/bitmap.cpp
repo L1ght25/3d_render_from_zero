@@ -1,7 +1,6 @@
 #include "bitmap.h"
 
 rendering::Bitmap::Bitmap(int width, int height) : width_(width), height_(height), pixels_(width * height * 4) {
-
 }
 
 std::vector<sf::Uint8> rendering::Bitmap::Fill(sf::Uint8 color) {

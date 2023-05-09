@@ -1,20 +1,18 @@
 #pragma once
 #include <cmath>
-#include <system_error>
-#include <limits>
-#include <vector>
 #include <iostream>
+#include <limits>
+#include <system_error>
+#include <vector>
 
 namespace geometry {
 // simple implementation of matrix
-template <class T>
-class Matrix {
-public:
+template <class T> class Matrix {
+  public:
     Matrix(size_t h, size_t w) : matrix_(h, std::vector<T>(w)), h_(h), w_(w) {
     }
 
     Matrix(std::vector<std::vector<double>> vec) : matrix_(std::move(vec)), h_(vec.size()), w_(vec[0].size()) {
-
     }
 
     Matrix(std::initializer_list<std::initializer_list<T>> matrix) : h_(matrix.size()) {
@@ -79,6 +77,22 @@ public:
         return std::move(ans);
     }
 
+    Matrix operator*=(const Matrix<T>& another) {
+        std::vector<std::vector<T>> new_matrix_(h_, std::vector<T>(another.w_));
+        for (size_t i = 0; i < h_; ++i) {
+            for (size_t k = 0; k < another.w_; ++k) {
+                T sum = 0;
+                for (size_t j = 0; j < w_; ++j) {
+                    sum += matrix_[i][j] * another.matrix_[j][k];
+                }
+                new_matrix_[i][k] = sum;
+            }
+        }
+        w_ = another.w_;
+        matrix_ = std::move(new_matrix_);
+        return *this;
+    }
+
     Matrix& operator+=(const Matrix<T>& another) {
         Check(*this, another);
         for (size_t i = 0; i < h_; ++i) {
@@ -103,9 +117,9 @@ public:
         return w_;
     }
 
-protected:
+  protected:
     size_t h_;
     size_t w_;
     std::vector<std::vector<T>> matrix_;
 };
-}
+}  // namespace geometry

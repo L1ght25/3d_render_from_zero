@@ -3,9 +3,9 @@
 
 namespace rendering {
 class Edge {
-public:
-using Vertex = geometry::Vertex;
-using Vector4d = geometry::Vector4d;
+  public:
+    using Vertex = geometry::Vertex;
+    using Vector4d = geometry::Vector4d;
 
     Edge(const Gradients& grad, const Vertex& first, const Vertex& second, int ind_of_min_v_color);
 
@@ -23,7 +23,7 @@ using Vector4d = geometry::Vector4d;
 
     double GetOneOverZ() const;
 
-private:
+  private:
     int y_start_;
     int y_end_;
     double x_step_;
@@ -38,4 +38,4 @@ private:
     double cur_one_over_z_;
     double cur_z_step_;
 };
-}
+}  // namespace rendering
