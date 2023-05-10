@@ -15,7 +15,8 @@ add_executable(3d_render
                 src/rendering/rendering_helpers/Edge.cpp
                 src/rendering/RenderContext.cpp
                 src/rendering/bitmap/bitmap.cpp
-                src/user_api/api.cpp)
+                src/user_api/api.cpp
+                src/camera/Camera.cpp)
 target_link_libraries(3d_render PRIVATE
         sfml-graphics
         sfml-window

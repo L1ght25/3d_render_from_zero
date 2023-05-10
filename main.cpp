@@ -2,6 +2,6 @@
 
 int main() {
     auto executor = api::View("../models/monkey.obj", "../textures/gradient.jpeg", 1000, 1000);
-    executor.Execute(false);
+    executor.Execute(true);
     return 0;
 }

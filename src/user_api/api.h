@@ -2,6 +2,7 @@
 #include "../geometric_primitives/4d_primitives.h"
 #include "../rendering/RenderContext.h"
 #include "../rendering/bitmap/bitmap.h"
+#include "../camera/Camera.h"
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <exception>
@@ -9,17 +10,6 @@
 #include <random>
 #include <string_view>
 #include <unistd.h>
-
-namespace constants {
-    inline constexpr int DEFAULT_WIDTH = 1000;
-    inline constexpr int DEFAULT_HEIGHT = 1000;
-    inline constexpr double MOVE_SCALE = 2;
-    inline constexpr double ROTATE_SCALE = 80;
-}
-
-inline constexpr double radToDeg(double angleInRadians) {
-    return angleInRadians * 180.0 / M_PI;
-}
 
 namespace api {
 class View {
@@ -32,7 +22,6 @@ class View {
     void Execute(bool automode = true);
 
   private:
-    void handle_movement(double delta);
 
     std::pair<double, double> handle_mouse_rotation(double x, double y);
 
@@ -53,6 +42,7 @@ class View {
     rendering::RenderContext main_renderer_;
 
     load::Object3d model_;
-    geometry::Matrix4d projection_translation_;
+
+    Camera camera_;
 };
 }  // namespace api

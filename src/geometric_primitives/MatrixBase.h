@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <cstdio>
 #include <iostream>
 #include <limits>
 #include <system_error>
@@ -103,8 +104,19 @@ template <class T> class Matrix {
         return *this;
     }
 
+    Matrix& operator-=(const Matrix<T>& another) {
+    Check(*this, another);
+    for (size_t i = 0; i < h_; ++i) {
+        for (size_t j = 0; j < w_; ++j) {
+            matrix_[i][j] -= another(i, j);
+        }
+    }
+    return *this;
+    }
+
     static void Check(const Matrix<T>& matrix_1, const Matrix<T>& matrix_2) {
         if (matrix_1.h_ != matrix_2.h_ or matrix_1.w_ != matrix_2.w_) {
+            fprintf(stderr, "Got size (%zu, %zu), but expected: (%zu, %zu)", matrix_2.Rows(), matrix_2.Columns(), matrix_1.Rows(), matrix_1.Columns());
             throw std::runtime_error("invalid operation length");
         }
     }

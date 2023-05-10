@@ -1,4 +1,5 @@
 #include "4d_primitives.h"
+#include <cmath>
 
 geometry::Matrix4d& geometry::Matrix4d::InitIdentityOperator() {
     for (size_t i = 0; i < 4; ++i) {
@@ -112,6 +113,10 @@ double geometry::Vector4d::operator[](size_t i) const {
     return matrix_[i][0];
 }
 
+double& geometry::Vector4d::operator[](size_t i) {
+    return matrix_[i][0];
+}
+
 geometry::Vector4d geometry::Vector4d::Transform(const Matrix4d& oper) const {
     return oper * (*this);
 }
@@ -122,4 +127,24 @@ geometry::Vector4d geometry::Vector4d::operator*(double alpha) const {
 
 geometry::Vector4d geometry::Vector4d::LinearInterpolation(const Vector4d &another, const double& coef) const {
     return *this + (another - *this) * coef;
+}
+
+double geometry::Vector4d::Length() const {
+    return std::sqrt(GetX() * GetX() + GetY() * GetY() + GetZ() * GetZ() + GetW() * GetW());
+}
+
+geometry::Vector4d geometry::Vector4d::Normalize() {
+    for (int i = 0; i < 3; ++i) {
+        matrix_[i][0] /= Length();
+    }
+    return *this;
+}
+
+geometry::Vector4d geometry::Vector4d::CrossProduct(const Vector4d& another) const {
+    Vector4d ans;
+    ans[0] = (*this)[1] * another[2] - (*this)[2] * another[1];
+    ans[1] = (*this)[2] * another[0] - (*this)[0] * another[2];
+    ans[2] = (*this)[0] * another[1] - (*this)[1] * another[0];
+
+    return ans;
 }

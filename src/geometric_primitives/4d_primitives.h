@@ -47,9 +47,17 @@ class Vector4d final : public Matrix4d {
 
     double operator[](size_t i) const;
 
+    double& operator[](size_t i);
+
     Vector4d Transform(const Matrix4d& oper) const;
 
     Vector4d operator*(double alpha) const;
+
+    Vector4d Normalize();
+
+    Vector4d CrossProduct(const Vector4d& another) const;
+
+    double Length() const;
 
     Vector4d LinearInterpolation(const Vector4d &another, const double& coef) const;
 

@@ -1,13 +1,11 @@
 #include "api.h"
 
 api::View::View(std::string_view model_path, std::string_view texture_path, int width, int height)
-    : main_window_(sf::VideoMode(width, height), "3d-rendered video"), main_renderer_(width, height), model_(model_path), texture_(width, height) {
+    : main_window_(sf::VideoMode(width, height), "3d-rendered video"), main_renderer_(width, height), model_(model_path), texture_(width, height),
+    camera_(0, 0, 3, 90, width, height, 0.1, 1000) {
     sf::Image text;
     text.loadFromFile(texture_path.data());
     image_to_bitmap(texture_, text);
-    auto projection = Matrix4d().InitPerspective(radToDeg(double(90)), (double)width / (double)height, 0.1, 1000.0);
-    auto translation = Matrix4d().InitTranslationOperator(0, 0, 3);
-    projection_translation_ = projection * translation;
     screen_.create(width, height);
 }
 
@@ -32,7 +30,7 @@ void api::View::Execute(bool automode) {
         auto curr_time = std::chrono::system_clock::now();
         std::chrono::duration<double> delta = curr_time - prev_time;
 
-        handle_movement(delta.count());
+        camera_.Update(delta.count());
         if (automode) {
             rotate_state += delta.count();
             render(rotate_state);
@@ -50,23 +48,7 @@ void api::View::Execute(bool automode) {
     }
 }
 
-void api::View::handle_movement(double delta) {
-    geometry::Matrix4d movement;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        movement.InitTranslationOperator(0, 0, -delta * constants::MOVE_SCALE);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        movement.InitTranslationOperator(0, 0, delta * constants::MOVE_SCALE);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        movement.InitTranslationOperator(-delta * constants::MOVE_SCALE, 0, 0);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        movement.InitTranslationOperator(delta * constants::MOVE_SCALE, 0, 0);
-    } else {
-        return;
-    }
-    projection_translation_ *= movement;
-}
-
-std::pair<double, double> api::View::handle_mouse_rotation(double x, double y) {
+std::pair<double, double> api::View::handle_mouse_rotation(double x, double y) {  // этот вид всё-таки не относится к камере
     static double delta_x = 0, delta_y = 0;
     static bool is_set = false;
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
@@ -84,11 +66,11 @@ std::pair<double, double> api::View::handle_mouse_rotation(double x, double y) {
 }
 
 geometry::Matrix4d api::View::get_transform(double rotate_state) {
-    return projection_translation_ * geometry::Matrix4d().InitRotation(0, rotate_state, rotate_state);
+    return camera_.GetTransform() * geometry::Matrix4d().InitRotation(0, rotate_state, rotate_state);
 }
 
 geometry::Matrix4d api::View::get_transform(double rotate_state_x, double rotate_state_y) {
-    return projection_translation_ * geometry::Matrix4d().InitRotation(rotate_state_x, rotate_state_y, 0);
+    return camera_.GetTransform() * geometry::Matrix4d().InitRotation(rotate_state_x, rotate_state_y, 0);
 }
 
 void api::View::image_to_bitmap(rendering::Bitmap& my_texture, const sf::Image& text) {
@@ -111,5 +93,5 @@ void api::View::render(double rotate_state_x, double rotate_state_y) {
     auto transform = get_transform(rotate_state_x, rotate_state_y);
     main_renderer_.Fill(0);
     main_renderer_.ClearZBuffer();
-    main_renderer_.DrawModel(model_, transform, texture_);
+    main_renderer_.DrawModel(model_, camera_.GetTransform(), texture_);
 }
