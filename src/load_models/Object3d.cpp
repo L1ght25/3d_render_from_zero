@@ -5,7 +5,19 @@ unsigned int load::countWordsInString(std::string const& str) {
     return std::distance(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>());
 }
 
-load::Object3d::Object3d(std::string_view filename) {
+const geometry::Vertex& load::Object3d::GetVertexByInd(int i) const {
+    return vertices_[indexes_[i]];
+}
+
+size_t load::Object3d::SizeOfPolygons() const {
+    return indexes_.size();
+}
+
+bool load::Object3d::IsAutoTransformed() const {
+    return is_auto_rotation_;
+}
+
+load::Object3d::Object3d(std::string_view filename, bool is_auto_rotation) : is_auto_rotation_(is_auto_rotation) {
     std::vector<geometry::Vector4d> texture_coords_;
     std::ifstream in(filename, std::ios::in);
     if (!in) {
@@ -24,10 +36,10 @@ load::Object3d::Object3d(std::string_view filename) {
             in_vert >> y;
             if (curr_line.starts_with("v ")) {
                 in_vert >> z;
-                vertices_.emplace_back(x, y, z);
+                vertices_.emplace_back(-x, -y, -z);  // because of inversed value of z :))
             }
             else {
-                texture_coords_.emplace_back(x, y, 0, 0);
+                texture_coords_.emplace_back(x, 1 - y, 0, 0);
             }
         } else if(curr_line.starts_with("f ")) {
             bool has_4_dim = false;

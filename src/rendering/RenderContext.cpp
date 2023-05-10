@@ -115,7 +115,7 @@ void rendering::RenderContext::DrawLeftRight(const Gradients& grad, Edge& left, 
         double cur_one_over_z = left.GetOneOverZ() + grad.GetOneOverZX() * (std::ceil(left.GetX()) - left.GetX());
         double cur_z_step = (right.GetOneOverZ() - left.GetOneOverZ()) / (right.GetX() - left.GetX());
 
-        for (int x = std::ceil(left.GetX()); x < int(right.GetX()); ++x) {
+        for (int x = std::ceil(left.GetX()); x < std::ceil(right.GetX()); ++x) {
             int cur_ind = y * width_ + x;
             if (cur_depth < z_buffer_[cur_ind]) {
                 z_buffer_[cur_ind] = cur_depth;

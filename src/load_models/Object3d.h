@@ -10,18 +10,17 @@ unsigned int countWordsInString(std::string const& str);
 class Object3d {
 public:
 using Vertex = geometry::Vertex;
-    Object3d(std::string_view filename);
+    Object3d(std::string_view filename, bool is_auto_rotation = false);
 
-    const Vertex& GetVertexByInd(int i) const {
-        return vertices_[indexes_[i]];
-    }
+    const Vertex& GetVertexByInd(int i) const;
 
-    size_t SizeOfPolygons() const {
-        return indexes_.size();
-    }
+    size_t SizeOfPolygons() const;
+
+    bool IsAutoTransformed() const;
 
 private:
     std::vector<Vertex> vertices_;
     std::vector<size_t>indexes_;
+    bool is_auto_rotation_;
 };
 }

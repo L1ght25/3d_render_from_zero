@@ -16,14 +16,13 @@ class View {
   public:
     using Matrix4d = geometry::Matrix4d;
 
-    View(std::string_view model_path, std::string_view texture_path,
-        int width = constants::DEFAULT_WIDTH, int height = constants::DEFAULT_HEIGHT);
+    View(int width = constants::DEFAULT_WIDTH, int height = constants::DEFAULT_HEIGHT);
 
-    void Execute(bool automode = true);
+    void Execute();
+
+    void LoadModel(std::string_view model_path, std::string_view texture_path, bool automode = false);
 
   private:
-
-    std::pair<double, double> handle_mouse_rotation(double x, double y);
 
     geometry::Matrix4d get_transform(double rotate_state);
 
@@ -33,15 +32,13 @@ class View {
 
     void render(double rotate_state);
 
-    void render(double rotate_state_x, double rotate_state_y);
-
     sf::RenderWindow main_window_;
     sf::Texture screen_;
 
-    rendering::Bitmap texture_;
     rendering::RenderContext main_renderer_;
 
-    load::Object3d model_;
+    std::vector<rendering::Bitmap> texures_;
+    std::vector<load::Object3d> models_;
 
     Camera camera_;
 };
