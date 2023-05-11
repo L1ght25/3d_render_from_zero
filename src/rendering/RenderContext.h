@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 
+#include "../constants/constants.h"
 #include "../geometric_primitives/4d_primitives.h"
 #include "../geometric_primitives/Vertex.h"
 #include "../load_models/Object3d.h"
@@ -24,14 +25,13 @@ class RenderContext : public Bitmap {
 
     RenderContext(int width, int height);
 
-    void DrawModel(const Object3d& model, const Matrix4d& transform, const Bitmap& texture);
+    void DrawModel(const Object3d& model, const Matrix4d& full_transform, const Matrix4d& obj_transform, const Bitmap& texture);
 
     void DrawTriangle(const Vertex& first_dot, const Vertex& second_dot, const Vertex& third_dot, const Bitmap& texture);
 
     void ClearZBuffer();
 
   private:
-
     bool ClipTriangleAlongAxis(std::vector<Vertex>& vertices, std::vector<geometry::Vertex>& clipped_vertices, int comp);
 
     void ClipTriangleAlongComponent(std::vector<Vertex>& vertices, std::vector<geometry::Vertex>& clipped_vertices, int comp, int factor);

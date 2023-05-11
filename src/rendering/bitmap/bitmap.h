@@ -11,7 +11,7 @@ class Bitmap {
 
     void SetPixel(int x, int y, sf::Uint8 r, sf::Uint8 g, sf::Uint8 b, sf::Uint8 a);
 
-    void CopyPixel(const Bitmap& map, int cur_x, int cur_y, int x, int y);
+    void CopyPixel(const Bitmap& map, int cur_x, int cur_y, int x, int y, double light);
 
     const sf::Uint8* GetPointerToPixels();
 

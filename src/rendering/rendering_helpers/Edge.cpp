@@ -14,7 +14,10 @@ rendering::Edge::Edge(const Gradients& grad, const Vertex& first, const Vertex& 
 
       cur_one_over_z_(grad.GetOneOverZPos(ind_of_min_v_color) + grad.GetOneOverZY() * (std::ceil(first.GetY()) - first.GetY()) +
                       grad.GetOneOverZX() * (cur_x_ - first.GetX())),
-      cur_z_step_(grad.GetOneOverZY() + grad.GetOneOverZX() * x_step_) {
+      cur_z_step_(grad.GetOneOverZY() + grad.GetOneOverZX() * x_step_),
+      cur_light_(grad.GetLightPos(ind_of_min_v_color) + grad.GetLightYStep() * (std::ceil(first.GetY()) - first.GetY()) +
+                 grad.GetLightXStep() * (cur_x_ - first.GetX())),
+      cur_light_step_(grad.GetLightYStep() + grad.GetLightXStep() * x_step_) {
 }
 
 void rendering::Edge::Step() {
@@ -22,6 +25,7 @@ void rendering::Edge::Step() {
     cur_texture_pos_ += texture_pos_step_;
     cur_depth_ += depth_step_;
     cur_one_over_z_ += cur_z_step_;
+    cur_light_ += cur_light_step_;
 }
 
 const geometry::Vector4d& rendering::Edge::GetTexturePos() const {
@@ -46,4 +50,8 @@ double rendering::Edge::GetDepth() const {
 
 double rendering::Edge::GetOneOverZ() const {
     return cur_one_over_z_;
+}
+
+double rendering::Edge::GetLight() const {
+    return cur_light_;
 }

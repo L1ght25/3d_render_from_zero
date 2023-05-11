@@ -59,7 +59,7 @@ class Vector4d final : public Matrix4d {
 
     double Length() const;
 
-    Vector4d LinearInterpolation(const Vector4d &another, const double& coef) const;
+    Vector4d LinearInterpolation(const Vector4d& another, const double& coef) const;
 
     friend class Vertex;
 };

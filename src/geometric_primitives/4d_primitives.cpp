@@ -20,7 +20,7 @@ geometry::Matrix4d& geometry::Matrix4d::InitScreenSpaceTransform(double half_hei
     InitIdentityOperator();
     matrix_[0][0] = half_width;
     matrix_[1][1] = -half_height;
-    matrix_[0][3] = half_width - 0.5;
+    matrix_[0][3] = half_width - 0.5;  // for accuracy
     matrix_[1][3] = half_height - 0.5;
     return *this;
 }
@@ -84,7 +84,7 @@ geometry::Matrix4d& geometry::Matrix4d::InitPerspective(double fov, double aspec
 }
 
 geometry::Vector4d::Vector4d(double x, double y, double z, double w) : Matrix4d{{x}, {y}, {z}, {w}} {
-    }
+}
 
 geometry::Vector4d::Vector4d(const Matrix<double>& mat) : Matrix4d{{mat(0, 0)}, {mat(1, 0)}, {mat(2, 0)}, {mat(3, 0)}} {
     if (mat.Columns() != 1) {
@@ -125,7 +125,7 @@ geometry::Vector4d geometry::Vector4d::operator*(double alpha) const {
     return {GetX() * alpha, GetY() * alpha, GetZ() * alpha, GetW() * alpha};
 }
 
-geometry::Vector4d geometry::Vector4d::LinearInterpolation(const Vector4d &another, const double& coef) const {
+geometry::Vector4d geometry::Vector4d::LinearInterpolation(const Vector4d& another, const double& coef) const {
     return *this + (another - *this) * coef;
 }
 

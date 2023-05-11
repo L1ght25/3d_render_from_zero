@@ -16,9 +16,9 @@ void rendering::Bitmap::SetPixel(int x, int y, sf::Uint8 r, sf::Uint8 g, sf::Uin
     pixels_[ind + 3] = a;
 }
 
-void rendering::Bitmap::CopyPixel(const Bitmap& map, int cur_x, int cur_y, int x, int y) {
+void rendering::Bitmap::CopyPixel(const Bitmap& map, int cur_x, int cur_y, int x, int y, double light) {
     int ind = (x + y * map.width_) * 4;
-    SetPixel(cur_x, cur_y, map.pixels_[ind], map.pixels_[ind + 1], map.pixels_[ind + 2], map.pixels_[ind + 3]);
+    SetPixel(cur_x, cur_y, light * map.pixels_[ind], light * map.pixels_[ind + 1], light * map.pixels_[ind + 2], light * map.pixels_[ind + 3]);
 }
 
 auto rendering::Bitmap::GetPointerToPixels() -> const sf::Uint8* {

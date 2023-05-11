@@ -4,17 +4,18 @@
 rendering::RenderContext::RenderContext(int width, int height) : Bitmap(width, height), z_buffer_(width * height) {
 }
 
-void rendering::RenderContext::ClipTriangleAlongComponent(std::vector<Vertex>& vertices,
-                                                          std::vector<geometry::Vertex>& clipped_vertices, int comp, int factor) {
+void rendering::RenderContext::ClipTriangleAlongComponent(std::vector<Vertex>& vertices, std::vector<geometry::Vertex>& clipped_vertices, int comp,
+                                                          int factor) {
     const Vertex* prev = &vertices.back();
     bool prev_is_inside = prev->GetPos()[comp] * factor <= prev->GetPos().GetW();
 
-    for (auto&& vertex: vertices) {
+    for (auto&& vertex : vertices) {
 
         bool curr_is_inside = vertex.GetPos()[comp] * factor <= vertex.GetPos().GetW();
 
         if (curr_is_inside ^ prev_is_inside) {
-            double coef = (prev->GetW() - prev->GetPos()[comp] * factor) / ((prev->GetW() - prev->GetPos()[comp] * factor) - (vertex.GetW() - vertex.GetPos()[comp] * factor));
+            double coef = (prev->GetW() - prev->GetPos()[comp] * factor) /
+                          ((prev->GetW() - prev->GetPos()[comp] * factor) - (vertex.GetW() - vertex.GetPos()[comp] * factor));
             clipped_vertices.emplace_back(prev->LinearInterpolation(vertex, coef));
         }
         if (curr_is_inside) {
@@ -54,20 +55,21 @@ void rendering::RenderContext::DrawTriangle(const Vertex& first_dot, const Verte
     std::vector<Vertex> vertices{first_dot, second_dot, third_dot};
     std::vector<Vertex> tmp_vertices;
 
-    if (ClipTriangleAlongAxis(vertices, tmp_vertices, 0) &&
-        ClipTriangleAlongAxis(vertices, tmp_vertices, 1) &&
+    if (ClipTriangleAlongAxis(vertices, tmp_vertices, 0) && ClipTriangleAlongAxis(vertices, tmp_vertices, 1) &&
         ClipTriangleAlongAxis(vertices, tmp_vertices, 2)) {
-            auto first_clipped_dot = vertices[0];
-            for (int i = 1; i < vertices.size() - 1; ++i) {
-                FillTriangle(first_clipped_dot, vertices[i], vertices[i + 1], texture);
-            }
+        auto first_clipped_dot = vertices[0];
+        for (int i = 1; i < vertices.size() - 1; ++i) {
+            FillTriangle(first_clipped_dot, vertices[i], vertices[i + 1], texture);
+        }
     }
 }
 
-void rendering::RenderContext::DrawModel(const Object3d& model, const Matrix4d& transform, const Bitmap& texture) {
+void rendering::RenderContext::DrawModel(const Object3d& model, const Matrix4d& full_transform, const Matrix4d& obj_transform,
+                                         const Bitmap& texture) {
     for (int i = 0; i < model.SizeOfPolygons(); i += 3) {
-        DrawTriangle(model.GetVertexByInd(i).Transform(transform), model.GetVertexByInd(i + 1).Transform(transform),
-                     model.GetVertexByInd(i + 2).Transform(transform), texture);
+        DrawTriangle(model.GetVertexByInd(i).Transform(full_transform, obj_transform),
+                     model.GetVertexByInd(i + 1).Transform(full_transform, obj_transform),
+                     model.GetVertexByInd(i + 2).Transform(full_transform, obj_transform), texture);
     }
 }
 
@@ -110,25 +112,29 @@ void rendering::RenderContext::EdgeScan(const Gradients& grad, Edge* first, Edge
 void rendering::RenderContext::DrawLeftRight(const Gradients& grad, Edge& left, Edge& right, int y_min, int y_max, const Bitmap& texture) {
     for (int y = y_min; y < y_max; ++y) {
 
-        geometry::Vector4d cur_texture_pos = left.GetTexturePos() + grad.GetXStep() * (std::ceil(left.GetX()) - left.GetX());
-        double cur_depth = left.GetDepth() + grad.GetDepthStepX() * (std::ceil(left.GetX()) - left.GetX());
-        double cur_one_over_z = left.GetOneOverZ() + grad.GetOneOverZX() * (std::ceil(left.GetX()) - left.GetX());
-        double cur_z_step = (right.GetOneOverZ() - left.GetOneOverZ()) / (right.GetX() - left.GetX());
+        double x_prestep = std::ceil(left.GetX()) - left.GetX();
 
-        for (int x = std::ceil(left.GetX()); x < std::ceil(right.GetX()); ++x) {
+        geometry::Vector4d cur_texture_pos = left.GetTexturePos() + grad.GetXStep() * x_prestep;
+        double cur_depth = left.GetDepth() + grad.GetDepthStepX() * x_prestep;
+        double cur_one_over_z = left.GetOneOverZ() + grad.GetOneOverZX() * x_prestep;
+        double cur_light = left.GetLight() + grad.GetLightXStep() * x_prestep;
+
+        for (int x = int(std::ceil(left.GetX())); x < int(std::ceil(right.GetX())); ++x) {
             int cur_ind = y * width_ + x;
             if (cur_depth < z_buffer_[cur_ind]) {
                 z_buffer_[cur_ind] = cur_depth;
                 double cur_z = 1.f / cur_one_over_z;
                 int tex_x = std::round(cur_texture_pos.GetX() * cur_z * (texture.Width() - 1));
                 int tex_y = std::round(cur_texture_pos.GetY() * cur_z * (texture.Height() - 1));
+                int light = std::round(cur_light * constants::MAX_LIGHT);
                 if (texture.IsInsideMap(tex_x, tex_y)) {
-                    CopyPixel(texture, x, y, tex_x, tex_y);
+                    CopyPixel(texture, x, y, tex_x, tex_y, cur_light);
                 }
             }
             cur_texture_pos += grad.GetXStep();
             cur_depth += grad.GetDepthStepX();
-            cur_one_over_z += cur_z_step;
+            cur_one_over_z += grad.GetOneOverZX();
+            cur_light += grad.GetLightXStep();
         }
         left.Step();
         right.Step();

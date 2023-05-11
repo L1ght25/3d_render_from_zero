@@ -1,2 +1,9 @@
 # 3d render from zero
-Implementation of basic 3d render
+Имплементация основных этапов пайплайна 3D-рендеринга. Сборка и тестирование проходили под macOS, на линуксе не запускал, но есть предположение, что там бем более должно работать)
+Как запустить:
+1) Склонировать репозиторий.
+2) Прописать из корня:
+##
+mkdir Release && cd Release && cmake -DCMAKE_BUILD_TYPE=Release .. && make 3d_render && ./3d_render
+##
+

@@ -1,11 +1,10 @@
 #include "Camera.h"
 #include <cmath>
 
-api::Camera::Camera(double x_pos, double y_pos, double z_pos, double angle, int width, int height, double z_near, double z_far) :
-    projection_(Matrix4d().InitPerspective(radToDeg(angle), (double)width / (double)height, z_near, z_far)),
-    camera_pos_(x_pos, y_pos, z_pos, 0), camera_direction_(0, 0, -1, 0), default_camera_direction_(camera_direction_),
-    camera_up_(0, 1, 0, 0), yaw_(0), pitch_(0),
-    translation_(geometry::Matrix4d().InitTranslationOperator(x_pos, y_pos, z_pos)) {
+api::Camera::Camera(double x_pos, double y_pos, double z_pos, double angle, int width, int height, double z_near, double z_far)
+    : projection_(Matrix4d().InitPerspective(constants::radToDeg(angle), (double)width / (double)height, z_near, z_far)),
+      camera_pos_(x_pos, y_pos, z_pos, 0), camera_direction_(0, 0, -1, 0), default_camera_direction_(camera_direction_), camera_up_(0, 1, 0, 0),
+      yaw_(0), pitch_(0), translation_(geometry::Matrix4d().InitTranslationOperator(x_pos, y_pos, z_pos)) {
     rotation_.InitIdentityOperator();
 }
 

@@ -23,6 +23,8 @@ class Edge {
 
     double GetOneOverZ() const;
 
+    double GetLight() const;
+
   private:
     int y_start_;
     int y_end_;
@@ -37,5 +39,8 @@ class Edge {
 
     double cur_one_over_z_;
     double cur_z_step_;
+
+    double cur_light_;
+    double cur_light_step_;
 };
 }  // namespace rendering

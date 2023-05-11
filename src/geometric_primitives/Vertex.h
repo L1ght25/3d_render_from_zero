@@ -6,11 +6,13 @@ class Vertex {
   public:
     Vertex(double x, double y, double z);
 
-    Vertex(double x, double y, double z, Vector4d texture);
+    Vertex(double x, double y, double z, Vector4d texture, Vector4d normal);
 
-    Vertex(Vector4d vec, Vector4d texture);
+    Vertex(Vector4d vec, Vector4d texture, Vector4d normal);
 
     void SetTexturePos(Vector4d pos);
+
+    void SetNormalPos(Vector4d pos);
 
     double GetX() const;
 
@@ -24,7 +26,11 @@ class Vertex {
 
     Vector4d GetTexturePos() const;
 
+    Vector4d GetNormal() const;
+
     Vertex Transform(const Matrix4d& oper) const;
+
+    Vertex Transform(const Matrix4d& full_transform, const Matrix4d& obj_transform) const;
 
     Vertex PerspectiveDivision();
 
@@ -37,5 +43,6 @@ class Vertex {
   private:
     Vector4d pos_;
     Vector4d texture_pos_;
+    Vector4d normal_;
 };
 }  // namespace geometry

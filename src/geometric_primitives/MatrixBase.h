@@ -64,6 +64,15 @@ template <class T> class Matrix {
         return new_matrix;
     }
 
+    Matrix operator*=(double alpha) {
+        for (size_t i = 0; i < h_; ++i) {
+            for (size_t j = 0; j < w_; ++j) {
+                matrix_[i][j] *= alpha;
+            }
+        }
+        return *this;
+    }
+
     Matrix operator*(const Matrix<T>& another) const {
         Matrix<T> ans(h_, another.w_);
         for (size_t i = 0; i < h_; ++i) {
@@ -105,18 +114,19 @@ template <class T> class Matrix {
     }
 
     Matrix& operator-=(const Matrix<T>& another) {
-    Check(*this, another);
-    for (size_t i = 0; i < h_; ++i) {
-        for (size_t j = 0; j < w_; ++j) {
-            matrix_[i][j] -= another(i, j);
+        Check(*this, another);
+        for (size_t i = 0; i < h_; ++i) {
+            for (size_t j = 0; j < w_; ++j) {
+                matrix_[i][j] -= another(i, j);
+            }
         }
-    }
-    return *this;
+        return *this;
     }
 
     static void Check(const Matrix<T>& matrix_1, const Matrix<T>& matrix_2) {
         if (matrix_1.h_ != matrix_2.h_ or matrix_1.w_ != matrix_2.w_) {
-            fprintf(stderr, "Got size (%zu, %zu), but expected: (%zu, %zu)", matrix_2.Rows(), matrix_2.Columns(), matrix_1.Rows(), matrix_1.Columns());
+            fprintf(stderr, "Got size (%zu, %zu), but expected: (%zu, %zu)", matrix_2.Rows(), matrix_2.Columns(), matrix_1.Rows(),
+                    matrix_1.Columns());
             throw std::runtime_error("invalid operation length");
         }
     }

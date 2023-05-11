@@ -1,8 +1,8 @@
 #pragma once
+#include "../camera/Camera.h"
 #include "../geometric_primitives/4d_primitives.h"
 #include "../rendering/RenderContext.h"
 #include "../rendering/bitmap/bitmap.h"
-#include "../camera/Camera.h"
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <exception>
@@ -20,13 +20,13 @@ class View {
 
     void Execute();
 
-    void LoadModel(std::string_view model_path, std::string_view texture_path, bool automode = false);
+    void LoadModel(std::string_view model_path, std::string_view texture_path, bool automode = false, bool is_inversed_z = false, double delta_x = 0,
+                   double delta_y = 0, double delta_z = 0);
 
   private:
+    geometry::Matrix4d get_object_transform(double rotate_state);
 
-    geometry::Matrix4d get_transform(double rotate_state);
-
-    geometry::Matrix4d get_transform(double rotate_state_x, double rotate_state_y);
+    geometry::Matrix4d get_object_transform(double rotate_state_x, double rotate_state_y);
 
     void image_to_bitmap(rendering::Bitmap& my_texture, const sf::Image& text);
 
