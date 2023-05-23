@@ -4,9 +4,9 @@
 rendering::Gradients::Gradients(const Vertex& min_y_v, const Vertex& mid_y_v, const Vertex& max_y_v)
     : texture_pos_{min_y_v.GetTexturePos(), mid_y_v.GetTexturePos(), max_y_v.GetTexturePos()},
       depth_(min_y_v.GetZ(), mid_y_v.GetZ(), max_y_v.GetZ(), 0), one_over_z_(1.f / min_y_v.GetW(), 1.f / mid_y_v.GetW(), 1.f / max_y_v.GetW(), 0),
-      light_(std::clamp(min_y_v.GetNormal().GetZ(), 0., 1.) * constants::LIGHT_SCALE + (1 - constants::LIGHT_SCALE),
-             std::clamp(mid_y_v.GetNormal().GetZ(), 0., 1.) * constants::LIGHT_SCALE + (1 - constants::LIGHT_SCALE),
-             std::clamp(max_y_v.GetNormal().GetZ(), 0., 1.) * constants::LIGHT_SCALE + (1 - constants::LIGHT_SCALE), 0) {
+      light_(std::clamp(min_y_v.GetNormal().GetZ(), 0., 1.) * constants::light_scale + (1 - constants::light_scale),
+             std::clamp(mid_y_v.GetNormal().GetZ(), 0., 1.) * constants::light_scale + (1 - constants::light_scale),
+             std::clamp(max_y_v.GetNormal().GetZ(), 0., 1.) * constants::light_scale + (1 - constants::light_scale), 0) {
     double dX =
         (mid_y_v.GetX() - max_y_v.GetX()) * (min_y_v.GetY() - max_y_v.GetY()) - (min_y_v.GetX() - max_y_v.GetX()) * (mid_y_v.GetY() - max_y_v.GetY());
     double dY = -dX;

@@ -2,9 +2,8 @@ cmake_minimum_required(VERSION 3.23)
 project(3d_render)
 find_package(SFML 2 COMPONENTS graphics REQUIRED)
 
+set(CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 23)
-
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 add_executable(3d_render
                 main.cpp

@@ -5,15 +5,19 @@
 namespace rendering {
 class Bitmap {
   public:
+    using Uint8 = sf::Uint8;
+
+    Bitmap() = default;
+
     Bitmap(int width, int height);
 
-    std::vector<sf::Uint8> Fill(sf::Uint8 color);
+    void Fill(Uint8 color);
 
-    void SetPixel(int x, int y, sf::Uint8 r, sf::Uint8 g, sf::Uint8 b, sf::Uint8 a);
+    void SetPixel(int x, int y, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
     void CopyPixel(const Bitmap& map, int cur_x, int cur_y, int x, int y, double light);
 
-    const sf::Uint8* GetPointerToPixels();
+    const Uint8* GetPointerToPixels();
 
     int Width() const;
 
@@ -22,8 +26,10 @@ class Bitmap {
     bool IsInsideMap(int x, int y) const;
 
   protected:
+
+    int GetIndByCoords(int x, int y) const;
     int width_;
     int height_;
-    std::vector<sf::Uint8> pixels_;
+    std::vector<Uint8> pixels_;
 };
 }  // namespace rendering

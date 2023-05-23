@@ -14,16 +14,16 @@ void api::Camera::handle_movement(double delta) {
         return;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        Vector4d move = camera_direction_ * delta * constants::MOVE_SCALE;
+        Vector4d move = camera_direction_ * delta * constants::move_scale;
         camera_pos_ += move;
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        Vector4d move = camera_direction_ * delta * constants::MOVE_SCALE;
+        Vector4d move = camera_direction_ * delta * constants::move_scale;
         camera_pos_ -= move;
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        Vector4d move = camera_direction_.CrossProduct(camera_up_).Normalize() * delta * constants::MOVE_SCALE;
+        Vector4d move = camera_direction_.CrossProduct(camera_up_).Normalize() * delta * constants::move_scale;
         camera_pos_ -= move;
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        Vector4d move = camera_direction_.CrossProduct(camera_up_).Normalize() * delta * constants::MOVE_SCALE;
+        Vector4d move = camera_direction_.CrossProduct(camera_up_).Normalize() * delta * constants::move_scale;
         camera_pos_ += move;
     } else {
         return;
@@ -38,8 +38,8 @@ void api::Camera::handle_rotation() {
         mouse_prev_y_ = sf::Mouse::getPosition().y;
         is_first = false;
     }
-    double delta_x = (sf::Mouse::getPosition().x - mouse_prev_x_) / constants::ROTATE_SCALE;
-    double delta_y = (sf::Mouse::getPosition().y - mouse_prev_y_) / constants::ROTATE_SCALE;
+    double delta_x = (sf::Mouse::getPosition().x - mouse_prev_x_) / constants::rotate_scale;
+    double delta_y = (sf::Mouse::getPosition().y - mouse_prev_y_) / constants::rotate_scale;
     yaw_ += delta_x;
     pitch_ += delta_y;
     if (pitch_ > M_PI_2) {

@@ -64,8 +64,8 @@ void rendering::RenderContext::DrawTriangle(const Vertex& first_dot, const Verte
     }
 }
 
-void rendering::RenderContext::DrawModel(const Object3d& model, const Matrix4d& full_transform, const Matrix4d& obj_transform,
-                                         const Bitmap& texture) {
+void rendering::RenderContext::DrawModel(const Object3d& model, const Matrix4d& full_transform, const Matrix4d& obj_transform) {
+    auto texture = model.GetTexture();
     for (int i = 0; i < model.SizeOfPolygons(); i += 3) {
         DrawTriangle(model.GetVertexByInd(i).Transform(full_transform, obj_transform),
                      model.GetVertexByInd(i + 1).Transform(full_transform, obj_transform),
@@ -126,7 +126,7 @@ void rendering::RenderContext::DrawLeftRight(const Gradients& grad, Edge& left, 
                 double cur_z = 1.f / cur_one_over_z;
                 int tex_x = std::round(cur_texture_pos.GetX() * cur_z * (texture.Width() - 1));
                 int tex_y = std::round(cur_texture_pos.GetY() * cur_z * (texture.Height() - 1));
-                int light = std::round(cur_light * constants::MAX_LIGHT);
+                int light = std::round(cur_light * constants::max_light);
                 if (texture.IsInsideMap(tex_x, tex_y)) {
                     CopyPixel(texture, x, y, tex_x, tex_y, cur_light);
                 }

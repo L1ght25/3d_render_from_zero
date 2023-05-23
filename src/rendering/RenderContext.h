@@ -25,7 +25,7 @@ class RenderContext : public Bitmap {
 
     RenderContext(int width, int height);
 
-    void DrawModel(const Object3d& model, const Matrix4d& full_transform, const Matrix4d& obj_transform, const Bitmap& texture);
+    void DrawModel(const Object3d& model, const Matrix4d& full_transform, const Matrix4d& obj_transform);
 
     void DrawTriangle(const Vertex& first_dot, const Vertex& second_dot, const Vertex& third_dot, const Bitmap& texture);
 

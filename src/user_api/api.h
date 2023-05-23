@@ -6,29 +6,29 @@
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <exception>
+#include <initializer_list>
 #include <iostream>
 #include <random>
 #include <string_view>
 #include <unistd.h>
+#include <ranges>
+
 
 namespace api {
-class View {
+class Application {
   public:
     using Matrix4d = geometry::Matrix4d;
+    using Object3d = load::Object3d;
 
-    View(int width = constants::DEFAULT_WIDTH, int height = constants::DEFAULT_HEIGHT);
+    Application(std::initializer_list<Object3d>models, int width = constants::default_width, int height = constants::default_height);
 
     void Execute();
 
-    void LoadModel(std::string_view model_path, std::string_view texture_path, bool automode = false, bool is_inversed_z = false, double delta_x = 0,
-                   double delta_y = 0, double delta_z = 0);
-
   private:
+
     geometry::Matrix4d get_object_transform(double rotate_state);
 
     geometry::Matrix4d get_object_transform(double rotate_state_x, double rotate_state_y);
-
-    void image_to_bitmap(rendering::Bitmap& my_texture, const sf::Image& text);
 
     void render(double rotate_state);
 
@@ -37,7 +37,6 @@ class View {
 
     rendering::RenderContext main_renderer_;
 
-    std::vector<rendering::Bitmap> texures_;
     std::vector<load::Object3d> models_;
 
     Camera camera_;

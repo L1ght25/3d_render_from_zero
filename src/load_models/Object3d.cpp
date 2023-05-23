@@ -1,4 +1,5 @@
 #include "Object3d.h"
+#include <string_view>
 
 unsigned int load::countWordsInString(std::string const& str) {
     std::stringstream stream(str);
@@ -17,8 +18,8 @@ bool load::Object3d::IsAutoTransformed() const {
     return is_auto_rotation_;
 }
 
-load::Object3d::Object3d(std::string_view filename, bool is_auto_rotation, bool is_inversed_z, double x_delta, double y_delta, double z_delta)
-    : is_auto_rotation_(is_auto_rotation) {
+load::Object3d::Object3d(std::string_view filename, std::string_view texture_filename, bool is_auto_rotation, bool is_inversed_z, double x_delta, double y_delta, double z_delta)
+    : is_auto_rotation_(is_auto_rotation), texture_(texture_filename) {
     std::vector<geometry::Vector4d> texture_coords_;
     std::vector<geometry::Vector4d> normal_coords_;
     std::ifstream in(filename, std::ios::in);
@@ -93,4 +94,20 @@ load::Object3d::Object3d(std::string_view filename, bool is_auto_rotation, bool 
             }
         }
     }
+}
+
+load::Object3d::Texture::Texture(std::string_view texture_path) {
+    sf::Image text;
+    text.loadFromFile(texture_path.data());
+    texture_map_ = rendering::Bitmap(text.getSize().x, text.getSize().y);
+    for (int x = 0; x < text.getSize().x; ++x) {
+        for (int y = 0; y < text.getSize().y; ++y) {
+            sf::Color col(text.getPixel(x, y));
+            texture_map_.SetPixel(x, y, col.r, col.g, col.b, constants::max_light);
+        }
+    }
+}
+
+const rendering::Bitmap& load::Object3d::GetTexture() const {
+    return texture_.texture_map_;
 }
