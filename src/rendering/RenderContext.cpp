@@ -67,7 +67,7 @@ void rendering::RenderContext::DrawTriangle(const Vertex& first_dot, const Verte
     }
 }
 
-void rendering::RenderContext::ClipTriangleAlongComponent(std::vector<Vertex>& vertices, std::vector<geometry::Vertex>& clipped_vertices, int comp,
+void rendering::RenderContext::ClipTriangleAlongComponent(std::vector<Vertex>& vertices, std::vector<Vertex>& clipped_vertices, int comp,
                                                           int factor) {
     const Vertex* prev = &vertices.back();
     bool prev_is_inside = prev->GetPos()[comp] * factor <= prev->GetPos().GetW();
@@ -92,7 +92,7 @@ void rendering::RenderContext::ClipTriangleAlongComponent(std::vector<Vertex>& v
     vertices.clear();
 }
 
-bool rendering::RenderContext::ClipTriangleAlongAxis(std::vector<Vertex>& vertices, std::vector<geometry::Vertex>& clipped_vertices, int comp) {
+bool rendering::RenderContext::ClipTriangleAlongAxis(std::vector<Vertex>& vertices, std::vector<Vertex>& clipped_vertices, int comp) {
     ClipTriangleAlongComponent(vertices, clipped_vertices, comp, 1);
 
     if (clipped_vertices.empty()) {

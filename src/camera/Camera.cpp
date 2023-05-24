@@ -8,6 +8,7 @@ api::Camera::Camera(double x_pos, double y_pos, double z_pos, double angle, int 
     : projection_(Matrix4d().InitPerspective(constants::radToDeg(angle), (double)width / (double)height, z_near, z_far)),
       camera_pos_(x_pos, y_pos, z_pos, 0), camera_direction_(default_camera_direction_),
       translation_(geometry::Matrix4d::InitTranslationOperator(x_pos, y_pos, z_pos)), rotation_(geometry::Matrix4d::InitIdentityOperator()) {
+
         movement_events_[CameraEvent::FORWARD] = [this] (double delta) -> void {
             Vector4d move = camera_direction_ * delta * constants::move_scale;
             camera_pos_ += move;

@@ -19,6 +19,10 @@ inline constexpr double default_camera_pos_z = 3;
 
 inline constexpr double light_scale = 0.6;
 
+inline constexpr double default_model_x = 0;
+inline constexpr double default_model_y = 0;
+inline constexpr double default_model_z = 0;
+
 inline constexpr double radToDeg(double angleInRadians) {
     return angleInRadians * 180.0 / M_PI;
 }
