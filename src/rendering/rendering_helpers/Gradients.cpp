@@ -12,20 +12,20 @@ rendering::Gradients::Gradients(const Vertex& min_y_v, const Vertex& mid_y_v, co
     double dY = -dX;
 
     for (size_t i = 0; i < 3; ++i) {
-        texture_pos_[i] *= one_over_z_(i, 0);
+        texture_pos_[i] *= one_over_z_[i];
     }
 
-    z_step_(0, 0) = calc_step<Vector4d, double>(one_over_z_, min_y_v, mid_y_v, max_y_v, dX, true);
-    z_step_(1, 0) = calc_step<Vector4d, double>(one_over_z_, min_y_v, mid_y_v, max_y_v, dY, false);
+    z_step_[0] = calc_step<Vector4d, double>(one_over_z_, min_y_v, mid_y_v, max_y_v, dX, true);
+    z_step_[1] = calc_step<Vector4d, double>(one_over_z_, min_y_v, mid_y_v, max_y_v, dY, false);
 
-    light_step_(0, 0) = calc_step<Vector4d, double>(light_, min_y_v, mid_y_v, max_y_v, dX, true);
-    light_step_(1, 0) = calc_step<Vector4d, double>(light_, min_y_v, mid_y_v, max_y_v, dY, false);
+    light_step_[0] = calc_step<Vector4d, double>(light_, min_y_v, mid_y_v, max_y_v, dX, true);
+    light_step_[1] = calc_step<Vector4d, double>(light_, min_y_v, mid_y_v, max_y_v, dY, false);
 
     x_step_ = calc_step<Vector4d*, Vector4d>(texture_pos_, min_y_v, mid_y_v, max_y_v, dX, true);
     y_step_ = calc_step<Vector4d*, Vector4d>(texture_pos_, min_y_v, mid_y_v, max_y_v, dY, false);
 
-    depth_step_(0, 0) = calc_step<Vector4d, double>(depth_, min_y_v, mid_y_v, max_y_v, dX, true);
-    depth_step_(1, 0) = calc_step<Vector4d, double>(depth_, min_y_v, mid_y_v, max_y_v, dY, false);
+    depth_step_[0] = calc_step<Vector4d, double>(depth_, min_y_v, mid_y_v, max_y_v, dX, true);
+    depth_step_[1] = calc_step<Vector4d, double>(depth_, min_y_v, mid_y_v, max_y_v, dY, false);
 }
 
 const geometry::Vector4d& rendering::Gradients::GetTexPos(int pos) const {
@@ -33,31 +33,31 @@ const geometry::Vector4d& rendering::Gradients::GetTexPos(int pos) const {
 }
 
 double rendering::Gradients::GetDepthPos(int pos) const {
-    return depth_(pos, 0);
+    return depth_[pos];
 }
 
 double rendering::Gradients::GetOneOverZPos(int pos) const {
-    return one_over_z_(pos, 0);
+    return one_over_z_[pos];
 }
 
 double rendering::Gradients::GetLightPos(int pos) const {
-    return light_(pos, 0);
+    return light_[pos];
 }
 
 double rendering::Gradients::GetDepthStepX() const {
-    return depth_step_(0, 0);
+    return depth_step_[0];
 }
 
 double rendering::Gradients::GetDepthStepY() const {
-    return depth_step_(1, 0);
+    return depth_step_[1];
 }
 
 double rendering::Gradients::GetOneOverZX() const {
-    return z_step_(0, 0);
+    return z_step_[0];
 }
 
 double rendering::Gradients::GetOneOverZY() const {
-    return z_step_(1, 0);
+    return z_step_[1];
 }
 
 const geometry::Vector4d& rendering::Gradients::GetXStep() const {
@@ -69,9 +69,9 @@ geometry::Vector4d rendering::Gradients::GetYStep() const {
 }
 
 double rendering::Gradients::GetLightXStep() const {
-    return light_step_(0, 0);
+    return light_step_[0];
 }
 
 double rendering::Gradients::GetLightYStep() const {
-    return light_step_(1, 0);
+    return light_step_[1];
 }

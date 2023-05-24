@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics/Export.hpp>
 #include <vector>
+#include <algorithm>
 
 namespace rendering {
 class Bitmap {

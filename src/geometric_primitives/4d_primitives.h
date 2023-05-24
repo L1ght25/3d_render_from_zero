@@ -10,8 +10,8 @@ class Matrix4d : public Matrix<double> {  // special matrix that is used in most
     Matrix4d(std::initializer_list<std::initializer_list<double>> matrix) : Matrix<double>(matrix) {
     }
 
-    Matrix4d(std::vector<std::vector<double>>&& vec) noexcept : Matrix<double>(std::move(vec)) {
-    }
+    // Matrix4d(std::vector<std::vector<double>>&& vec) noexcept : Matrix<double>(std::move(vec)) {
+    // }
 
     Matrix4d(const Matrix<double>& another) : Matrix<double>(another) {
     }
@@ -29,9 +29,9 @@ class Matrix4d : public Matrix<double> {  // special matrix that is used in most
     Matrix4d& InitPerspective(double fov, double aspect, double z_near, double z_far);
 };
 
-class Vector4d final : public Matrix4d {
+class Vector4d final : public Matrix<double> {
   public:
-    Vector4d() = default;
+    Vector4d();
 
     Vector4d(double x, double y, double z, double w);
 
@@ -59,8 +59,6 @@ class Vector4d final : public Matrix4d {
 
     double Length() const;
 
-    Vector4d LinearInterpolation(const Vector4d& another, const double& coef) const;
-
-    friend class Vertex;
+    Vector4d LinearInterpolationBetweenDots(const Vector4d& another, const double& coef) const;
 };
 }  // namespace geometry

@@ -48,11 +48,11 @@ geometry::Vector4d geometry::Vertex::GetNormal() const {
     return normal_;
 }
 
-geometry::Vertex geometry::Vertex::Transform(const geometry::Matrix4d& oper) const {
+geometry::Vertex geometry::Vertex::TransformBy(const geometry::Matrix4d& oper) const {
     return {pos_.Transform(oper), texture_pos_, normal_};
 }
 
-geometry::Vertex geometry::Vertex::Transform(const geometry::Matrix4d& full_transform, const geometry::Matrix4d& obj_transform) const {
+geometry::Vertex geometry::Vertex::TransformBy(const geometry::Matrix4d& full_transform, const geometry::Matrix4d& obj_transform) const {
     return {pos_.Transform(full_transform), texture_pos_, normal_.Transform(obj_transform)};
 }
 
@@ -60,9 +60,9 @@ geometry::Vertex geometry::Vertex::PerspectiveDivision() {
     return {geometry::Vector4d{pos_.GetX() / pos_.GetW(), pos_.GetY() / pos_.GetW(), pos_.GetZ() / pos_.GetW(), pos_.GetW()}, texture_pos_, normal_};
 }
 
-geometry::Vertex geometry::Vertex::LinearInterpolation(const Vertex& another, const double& coef) const {
-    return {pos_.LinearInterpolation(another.pos_, coef), texture_pos_.LinearInterpolation(another.texture_pos_, coef),
-            normal_.LinearInterpolation(another.normal_, coef)};
+geometry::Vertex geometry::Vertex::GetLinearInterpolationOfVertices(const Vertex& another, const double& coef) const {
+    return {pos_.LinearInterpolationBetweenDots(another.pos_, coef), texture_pos_.LinearInterpolationBetweenDots(another.texture_pos_, coef),
+            normal_.LinearInterpolationBetweenDots(another.normal_, coef)};
 }
 
 double geometry::Vertex::SquareTriangleTwice(const geometry::Vertex& second_v, const geometry::Vertex& third_v) const {

@@ -16,7 +16,7 @@ void rendering::RenderContext::ClipTriangleAlongComponent(std::vector<Vertex>& v
         if (curr_is_inside ^ prev_is_inside) {
             double coef = (prev->GetW() - prev->GetPos()[comp] * factor) /
                           ((prev->GetW() - prev->GetPos()[comp] * factor) - (vertex.GetW() - vertex.GetPos()[comp] * factor));
-            clipped_vertices.emplace_back(prev->LinearInterpolation(vertex, coef));
+            clipped_vertices.emplace_back(prev->GetLinearInterpolationOfVertices(vertex, coef));
         }
         if (curr_is_inside) {
             clipped_vertices.emplace_back(std::move(vertex));
@@ -67,17 +67,17 @@ void rendering::RenderContext::DrawTriangle(const Vertex& first_dot, const Verte
 void rendering::RenderContext::DrawModel(const Object3d& model, const Matrix4d& full_transform, const Matrix4d& obj_transform) {
     auto texture = model.GetTexture();
     for (int i = 0; i < model.SizeOfPolygons(); i += 3) {
-        DrawTriangle(model.GetVertexByInd(i).Transform(full_transform, obj_transform),
-                     model.GetVertexByInd(i + 1).Transform(full_transform, obj_transform),
-                     model.GetVertexByInd(i + 2).Transform(full_transform, obj_transform), texture);
+        DrawTriangle(model.GetVertexByInd(i).TransformBy(full_transform, obj_transform),
+                     model.GetVertexByInd(i + 1).TransformBy(full_transform, obj_transform),
+                     model.GetVertexByInd(i + 2).TransformBy(full_transform, obj_transform), texture);
     }
 }
 
 void rendering::RenderContext::FillTriangle(const Vertex& first_dot, const Vertex& second_dot, const Vertex& third_dot, const Bitmap& texture) {
     static Matrix4d perspective = Matrix4d().InitScreenSpaceTransform((double)height_ / 2, (double)width_ / 2);
-    auto first = first_dot.Transform(perspective).PerspectiveDivision();
-    auto second = second_dot.Transform(perspective).PerspectiveDivision();
-    auto third = third_dot.Transform(perspective).PerspectiveDivision();
+    auto first = first_dot.TransformBy(perspective).PerspectiveDivision();
+    auto second = second_dot.TransformBy(perspective).PerspectiveDivision();
+    auto third = third_dot.TransformBy(perspective).PerspectiveDivision();
     std::vector<Vertex> sorted_dots = {first, second, third};
     std::sort(sorted_dots.begin(), sorted_dots.end(), [](const Vertex& first, const Vertex& second) { return first.GetY() <= second.GetY(); });
     Gradients grad(sorted_dots[0], sorted_dots[1], sorted_dots[2]);

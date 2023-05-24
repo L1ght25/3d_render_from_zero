@@ -20,7 +20,7 @@ class Application {
     using Matrix4d = geometry::Matrix4d;
     using Object3d = load::Object3d;
 
-    Application(std::initializer_list<Object3d>models, int width = constants::default_width, int height = constants::default_height);
+    Application(std::initializer_list<Object3d> models, int width = constants::default_width, int height = constants::default_height);
 
     void Execute();
 
