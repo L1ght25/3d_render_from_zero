@@ -1,8 +1,9 @@
 #include "src/load_models/Object3d.h"
 #include "src/rendering/bitmap/bitmap.h"
 #include "src/user_api/api.h"
+#include <exception>
 
-int main() {
+int main() try {
     auto executor = api::Application(
         {
             {"../models/smooth_monkey.obj", "../textures/gradient.jpeg", model::IsAutoRotated},
@@ -12,4 +13,6 @@ int main() {
         }, constants::default_width, constants::default_height);
     executor.Execute();
     return 0;
+} catch(const std::exception& exc) {
+    std::cerr << exc.what() << std::endl;
 }

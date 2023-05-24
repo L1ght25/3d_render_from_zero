@@ -1,7 +1,6 @@
 #pragma once
 #include "../constants/constants.h"
 #include "../geometric_primitives/4d_primitives.h"
-#include <SFML/Graphics.hpp>
 #include <functional>
 #include <unordered_map>
 
