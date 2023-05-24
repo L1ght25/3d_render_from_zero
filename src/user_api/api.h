@@ -18,26 +18,32 @@ namespace api {
 class Application {
   public:
     using Matrix4d = geometry::Matrix4d;
-    using Object3d = load::Object3d;
+    using Object3d = model::Object3d;
+    using Image = const sf::Uint8*;
 
     Application(std::initializer_list<Object3d> models, int width = constants::default_width, int height = constants::default_height);
 
     void Execute();
 
   private:
+    struct SfmlDrawConnection {
+      SfmlDrawConnection(int width, int height);
 
-    geometry::Matrix4d get_object_transform(double rotate_state);
+      void Draw(Image image);
 
-    geometry::Matrix4d get_object_transform(double rotate_state_x, double rotate_state_y);
+      sf::RenderWindow main_window_;
+      sf::Texture screen_;
+      sf::Sprite sprite_;
+    };
 
-    void render(double rotate_state);
+    CameraEvent HandleCameraEventsOrClose();
 
-    sf::RenderWindow main_window_;
-    sf::Texture screen_;
+    void UpdateWorld(double& rotate_state, CameraEvent event);
 
+    SfmlDrawConnection sfml_details_;
     rendering::RenderContext main_renderer_;
 
-    std::vector<load::Object3d> models_;
+    std::vector<Object3d> models_;
 
     Camera camera_;
 };

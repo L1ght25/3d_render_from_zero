@@ -1,48 +1,50 @@
 #include "4d_primitives.h"
 #include <cmath>
 
-geometry::Matrix4d& geometry::Matrix4d::InitIdentityOperator() {
+geometry::Matrix4d geometry::Matrix4d::InitIdentityOperator() {
+    Matrix4d result;
     for (size_t i = 0; i < 4; ++i) {
-        matrix_[i, i] = 1;
+        result[i, i] = 1;
     }
-    return *this;
+    return result;
 }
 
-geometry::Matrix4d& geometry::Matrix4d::InitTranslationOperator(double x, double y, double z) {
-    InitIdentityOperator();
-    matrix_[0, 3] = x;
-    matrix_[1, 3] = y;
-    matrix_[2, 3] = z;
-    return *this;
+geometry::Matrix4d geometry::Matrix4d::InitTranslationOperator(double x, double y, double z) {
+    auto result = InitIdentityOperator();
+    result[0, 3] = x;
+    result[1, 3] = y;
+    result[2, 3] = z;
+    return result;
 }
 
-geometry::Matrix4d& geometry::Matrix4d::InitScreenSpaceTransform(double half_height, double half_width) {
-    InitIdentityOperator();
-    matrix_[0, 0] = half_width;
-    matrix_[1, 1] = -half_height;
-    matrix_[0, 3] = half_width - 0.5;  // for accuracy
-    matrix_[1, 3] = half_height - 0.5;
-    return *this;
+geometry::Matrix4d geometry::Matrix4d::InitScreenSpaceTransform(double half_height, double half_width) {
+    auto result = InitIdentityOperator();
+    result[0, 0] = half_width;
+    result[1, 1] = -half_height;
+    result[0, 3] = half_width - 0.5;  // for accuracy
+    result[1, 3] = half_height - 0.5;
+    return result;
 }
 
-geometry::Matrix4d& geometry::Matrix4d::InitRotation(double x, double y, double z, double alpha) {  // поворот вокруг произвольной оси
+geometry::Matrix4d geometry::Matrix4d::InitRotation(double x, double y, double z, double alpha) {  // поворот вокруг произвольной оси
     double sin_alpha = std::sin(alpha);
     double cos_alpha = std::cos(alpha);
     double cos_inv = 1 - cos_alpha;
-    matrix_[0, 0] = cos_alpha + x * x * cos_inv;
-    matrix_[0, 1] = x * y * cos_inv - z * sin_alpha;
-    matrix_[0, 2] = x * z * cos_inv + y * sin_alpha;
-    matrix_[1, 0] = x * y * cos_inv + z * sin_alpha;
-    matrix_[1, 1] = cos_alpha + y * y * cos_inv;
-    matrix_[1, 2] = y * z * cos_inv - x * sin_alpha;
-    matrix_[2, 0] = x * z * cos_inv - y * sin_alpha;
-    matrix_[2, 1] = y * z * cos_inv + x * sin_alpha;
-    matrix_[2, 2] = cos_alpha + z * z * cos_inv;
-    matrix_[3, 3] = 1;
-    return *this;
+    Matrix4d result;
+    result[0, 0] = cos_alpha + x * x * cos_inv;
+    result[0, 1] = x * y * cos_inv - z * sin_alpha;
+    result[0, 2] = x * z * cos_inv + y * sin_alpha;
+    result[1, 0] = x * y * cos_inv + z * sin_alpha;
+    result[1, 1] = cos_alpha + y * y * cos_inv;
+    result[1, 2] = y * z * cos_inv - x * sin_alpha;
+    result[2, 0] = x * z * cos_inv - y * sin_alpha;
+    result[2, 1] = y * z * cos_inv + x * sin_alpha;
+    result[2, 2] = cos_alpha + z * z * cos_inv;
+    result[3, 3] = 1;
+    return result;
 }
 
-geometry::Matrix4d& geometry::Matrix4d::InitRotation(double x, double y, double z) {  // композиция поворотов вокруг осей
+geometry::Matrix4d geometry::Matrix4d::InitRotation(double x, double y, double z) {  // композиция поворотов вокруг осей
     Matrix4d rotate_x;
     Matrix4d rotate_y;
     Matrix4d rotate_z;
@@ -65,22 +67,23 @@ geometry::Matrix4d& geometry::Matrix4d::InitRotation(double x, double y, double 
     rotate_z[1, 0] = sin(z);
     rotate_z[1, 1] = cos(z);
 
-    *this = std::move(Matrix4d(std::move(rotate_z)) * Matrix4d(std::move(rotate_y)) * Matrix4d(std::move(rotate_x)));
-    matrix_[3, 3] = 1;
-    return *this;
+    auto result = std::move(Matrix4d(std::move(rotate_z)) * Matrix4d(std::move(rotate_y)) * Matrix4d(std::move(rotate_x)));
+    result[3, 3] = 1;
+    return result;
 }
 
-geometry::Matrix4d& geometry::Matrix4d::InitPerspective(double fov, double aspect, double z_near, double z_far) {
+geometry::Matrix4d geometry::Matrix4d::InitPerspective(double fov, double aspect, double z_near, double z_far) {
     double tan_half = std::tan(fov / 2);
     double z_range = z_near - z_far;
 
-    matrix_[0, 0] = (double)1 / (tan_half * aspect);
-    matrix_[1, 1] = (double)1 / tan_half;
-    matrix_[2, 2] = -(z_near + z_far) / z_range;
-    matrix_[2, 3] = 2 * z_far * z_near / z_range;
-    matrix_[3, 2] = 1;
+    Matrix4d result;
+    result[0, 0] = (double)1 / (tan_half * aspect);
+    result[1, 1] = (double)1 / tan_half;
+    result[2, 2] = -(z_near + z_far) / z_range;
+    result[2, 3] = 2 * z_far * z_near / z_range;
+    result[3, 2] = 1;
 
-    return *this;
+    return result;
 }
 
 geometry::Vector4d::Vector4d() : Matrix<double>(4, 1) {
@@ -121,15 +124,15 @@ double& geometry::Vector4d::operator[](size_t i) {
     return matrix_[i, 0];
 }
 
-geometry::Vector4d geometry::Vector4d::Transform(const Matrix4d& oper) const {
-    return oper * (*this);
+geometry::Vector4d geometry::Vector4d::TransformVectorByOperator(const Vector4d& vec, const Matrix4d& oper) {
+    return oper * vec;
 }
 
 geometry::Vector4d geometry::Vector4d::operator*(double alpha) const {
     return {GetX() * alpha, GetY() * alpha, GetZ() * alpha, GetW() * alpha};
 }
 
-geometry::Vector4d geometry::Vector4d::LinearInterpolationBetweenDots(const Vector4d& another, const double& coef) const {
+geometry::Vector4d geometry::Vector4d::LinearInterpolationBetweenDots(const Vector4d& another, double coef) const {
     return *this + (another - *this) * coef;
 }
 

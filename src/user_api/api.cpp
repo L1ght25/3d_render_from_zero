@@ -1,64 +1,80 @@
 #include "api.h"
 #include "../constants/constants.h"
+#include <chrono>
 
 api::Application::Application(std::initializer_list<Object3d>models, int width, int height)
-    : main_window_(sf::VideoMode(width, height), "3d-rendered video"), main_renderer_(width, height),
+    : sfml_details_(width, height), main_renderer_(width, height),
       camera_(0, 0, constants::default_camera_pos_z, constants::default_projection_angle, width, height, constants::default_z_near,
               constants::default_z_far),
       models_(models) {
-    screen_.create(width, height);
 }
 
 void api::Application::Execute() {
-    sf::Sprite sprite(screen_);
-    screen_.update(main_renderer_.GetPointerToPixels());
 
     double rotate_state = 0;
-    double curr_x = 0, curr_y = 0;
-    auto prev_time = std::chrono::system_clock::now();
 
-    while (main_window_.isOpen()) {
-        sf::Event event;
-        while (main_window_.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                main_window_.close();
-                break;
-            }
+    while (sfml_details_.main_window_.isOpen()) {
+        CameraEvent last_event = HandleCameraEventsOrClose();
+        UpdateWorld(rotate_state, last_event);
+
+        Image screen_view = main_renderer_.MakeImage(models_, camera_, rotate_state);
+
+        sfml_details_.Draw(screen_view);
+    }
+}
+
+api::CameraEvent api::Application::HandleCameraEventsOrClose() {
+    sf::Event event;
+    while (sfml_details_.main_window_.pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            sfml_details_.main_window_.close();
+            break;
         }
-        main_window_.clear();
+    }
 
-        auto curr_time = std::chrono::system_clock::now();
-        std::chrono::duration<double> delta = curr_time - prev_time;
-
-        camera_.Update(delta.count());
-        rotate_state += delta.count();
-        render(rotate_state);
-
-        prev_time = curr_time;
-
-        screen_.update(main_renderer_.GetPointerToPixels());
-
-        main_window_.draw(sprite);
-        main_window_.display();
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+        return CameraEvent::FORWARD;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        return CameraEvent::BACKWARD;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        return CameraEvent::LEFT;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        return CameraEvent::RIGHT;
+    } else {
+        return CameraEvent::NOTHING;
     }
 }
 
-geometry::Matrix4d api::Application::get_object_transform(double rotate_state) {
-    return geometry::Matrix4d().InitRotation(0, rotate_state, rotate_state);
-}
+void api::Application::UpdateWorld(double& rotate_state, CameraEvent event) {
+    static double mouse_prev_x_ = sf::Mouse::getPosition().x;
+    static double mouse_prev_y_ = sf::Mouse::getPosition().y;
+    static auto prev_time = std::chrono::system_clock::now();
 
-geometry::Matrix4d api::Application::get_object_transform(double rotate_state_x, double rotate_state_y) {
-    return geometry::Matrix4d().InitRotation(rotate_state_x, rotate_state_y, 0);
-}
+    sfml_details_.main_window_.clear();
+    auto curr_time = std::chrono::system_clock::now();
+    std::chrono::duration<double> delta = curr_time - prev_time;
 
-void api::Application::render(double rotate_state) {
-    static auto identity = Matrix4d().InitIdentityOperator();
-    auto all_objects_transform = get_object_transform(rotate_state);
-    main_renderer_.Fill(constants::default_grey);
-    main_renderer_.ClearZBuffer();
+    double delta_yaw = (sf::Mouse::getPosition().x - mouse_prev_x_) / constants::rotate_scale;
+    double delta_pitch = (sf::Mouse::getPosition().y - mouse_prev_y_) / constants::rotate_scale;
 
-    for (size_t i = 0; i < models_.size(); ++i) {
-        auto object_transform = models_[i].IsAutoTransformed() ? all_objects_transform : identity;
-        main_renderer_.DrawModel(models_[i], camera_.GetTransform() * object_transform, object_transform);
+    camera_.UpdateRotation(delta_yaw, delta_pitch);
+    if (event != CameraEvent::NOTHING) {
+        camera_.UpdateMovement(delta.count(), event);
     }
+    rotate_state += delta.count();
+
+    mouse_prev_x_ = sf::Mouse::getPosition().x;
+    mouse_prev_y_ = sf::Mouse::getPosition().y;
+    prev_time = curr_time;
+}
+
+api::Application::SfmlDrawConnection::SfmlDrawConnection(int width, int height) : main_window_(sf::VideoMode(width, height), "3d-rendered video") {
+    screen_.create(width, height);
+    sprite_ = sf::Sprite{screen_};
+}
+
+void api::Application::SfmlDrawConnection::Draw(Image image) {
+    screen_.update(image);
+    main_window_.draw(sprite_);
+    main_window_.display();
 }

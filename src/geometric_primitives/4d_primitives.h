@@ -16,17 +16,17 @@ class Matrix4d : public Matrix<double> {  // special matrix that is used in most
     Matrix4d(const Matrix<double>& another) : Matrix<double>(another) {
     }
 
-    Matrix4d& InitIdentityOperator();
+    static Matrix4d InitIdentityOperator();
 
-    Matrix4d& InitTranslationOperator(double x, double y, double z);
+    static Matrix4d InitTranslationOperator(double x, double y, double z);
 
-    Matrix4d& InitScreenSpaceTransform(double half_height, double half_width);
+    static Matrix4d InitScreenSpaceTransform(double half_height, double half_width);
 
-    Matrix4d& InitRotation(double x, double y, double z, double alpha);
+    static Matrix4d InitRotation(double x, double y, double z, double alpha);
 
-    Matrix4d& InitRotation(double x, double y, double z);
+    static Matrix4d InitRotation(double x, double y, double z);
 
-    Matrix4d& InitPerspective(double fov, double aspect, double z_near, double z_far);
+    static Matrix4d InitPerspective(double fov, double aspect, double z_near, double z_far);
 };
 
 class Vector4d final : public Matrix<double> {
@@ -49,7 +49,7 @@ class Vector4d final : public Matrix<double> {
 
     double& operator[](size_t i);
 
-    Vector4d Transform(const Matrix4d& oper) const;
+    static Vector4d TransformVectorByOperator(const Vector4d& vec, const Matrix4d& oper);
 
     Vector4d operator*(double alpha) const;
 
@@ -59,6 +59,6 @@ class Vector4d final : public Matrix<double> {
 
     double Length() const;
 
-    Vector4d LinearInterpolationBetweenDots(const Vector4d& another, const double& coef) const;
+    Vector4d LinearInterpolationBetweenDots(const Vector4d& another, double coef) const;
 };
 }  // namespace geometry

@@ -7,8 +7,7 @@
 #include <sstream>
 #include <SFML/Graphics.hpp>
 
-namespace load {
-unsigned int countWordsInString(std::string const& str);
+namespace model {
 
 class Object3d {
   public:
@@ -35,4 +34,4 @@ class Object3d {
     Texture texture_;
     bool is_auto_rotation_;
 };
-}  // namespace load
+}  // namespace model

@@ -49,30 +49,34 @@ geometry::Vector4d geometry::Vertex::GetNormal() const {
 }
 
 geometry::Vertex geometry::Vertex::TransformBy(const geometry::Matrix4d& oper) const {
-    return {pos_.Transform(oper), texture_pos_, normal_};
+    return {Vector4d::TransformVectorByOperator(pos_, oper), texture_pos_, normal_};
 }
 
 geometry::Vertex geometry::Vertex::TransformBy(const geometry::Matrix4d& full_transform, const geometry::Matrix4d& obj_transform) const {
-    return {pos_.Transform(full_transform), texture_pos_, normal_.Transform(obj_transform)};
+    return {Vector4d::TransformVectorByOperator(pos_, full_transform), texture_pos_, Vector4d::TransformVectorByOperator(normal_, obj_transform)};
 }
 
 geometry::Vertex geometry::Vertex::PerspectiveDivision() {
     return {geometry::Vector4d{pos_.GetX() / pos_.GetW(), pos_.GetY() / pos_.GetW(), pos_.GetZ() / pos_.GetW(), pos_.GetW()}, texture_pos_, normal_};
 }
 
-geometry::Vertex geometry::Vertex::GetLinearInterpolationOfVertices(const Vertex& another, const double& coef) const {
+geometry::Vertex geometry::Vertex::GetLinearInterpolationOfVertices(const Vertex& another, double coef) const {
     return {pos_.LinearInterpolationBetweenDots(another.pos_, coef), texture_pos_.LinearInterpolationBetweenDots(another.texture_pos_, coef),
             normal_.LinearInterpolationBetweenDots(another.normal_, coef)};
 }
 
-double geometry::Vertex::SquareTriangleTwice(const geometry::Vertex& second_v, const geometry::Vertex& third_v) const {
-    return (second_v.GetX() - GetX()) * (third_v.GetY() - GetY()) - (third_v.GetX() - GetX()) * (second_v.GetY() - GetY());
-}
-
-bool geometry::Vertex::IsInsideView() const {
+bool geometry::Vertex::IsInsideCubedView() const {
     bool is_inside = true;
     for (int i = 0; i < 3; ++i) {
         is_inside &= -GetW() <= GetPos()[i] && GetPos()[i] <= GetW();
     }
     return is_inside;
+}
+
+bool geometry::Vertex::IsPositiveSquare(const Vertex &second_v, const Vertex &third_v) const {
+    return SquareTriangleTwice(second_v, third_v) >= 0;
+}
+
+double geometry::Vertex::SquareTriangleTwice(const geometry::Vertex& second_v, const geometry::Vertex& third_v) const {
+    return (second_v.GetX() - GetX()) * (third_v.GetY() - GetY()) - (third_v.GetX() - GetX()) * (second_v.GetY() - GetY());
 }

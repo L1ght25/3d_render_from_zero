@@ -26,13 +26,15 @@ class Vertex {
 
     Vertex PerspectiveDivision();
 
-    Vertex GetLinearInterpolationOfVertices(const Vertex& another, const double& coef) const;
+    Vertex GetLinearInterpolationOfVertices(const Vertex& another, double coef) const;
 
-    double SquareTriangleTwice(const Vertex& second_v, const Vertex& third_v) const;
+    bool IsInsideCubedView() const;
 
-    bool IsInsideView() const;
+    bool IsPositiveSquare(const Vertex &second_v, const Vertex &third_v) const;
 
   private:
+    double SquareTriangleTwice(const Vertex& second_v, const Vertex& third_v) const;
+
     Vector4d pos_;
     Vector4d texture_pos_;
     Vector4d normal_;

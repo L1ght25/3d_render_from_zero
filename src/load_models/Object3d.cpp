@@ -1,24 +1,26 @@
 #include "Object3d.h"
 #include <string_view>
 
-unsigned int load::countWordsInString(std::string const& str) {
-    std::stringstream stream(str);
-    return std::distance(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>());
+namespace {
+    unsigned int countWordsInString(std::string const& str) {
+        std::stringstream stream(str);
+        return std::distance(std::istream_iterator<std::string>(stream), std::istream_iterator<std::string>());
+    }
 }
 
-const geometry::Vertex& load::Object3d::GetVertexByInd(int i) const {
+const geometry::Vertex& model::Object3d::GetVertexByInd(int i) const {
     return vertices_[indexes_[i]];
 }
 
-size_t load::Object3d::SizeOfPolygons() const {
+size_t model::Object3d::SizeOfPolygons() const {
     return indexes_.size();
 }
 
-bool load::Object3d::IsAutoTransformed() const {
+bool model::Object3d::IsAutoTransformed() const {
     return is_auto_rotation_;
 }
 
-load::Object3d::Object3d(std::string_view filename, std::string_view texture_filename, bool is_auto_rotation, bool is_inversed_z, double x_delta, double y_delta, double z_delta)
+model::Object3d::Object3d(std::string_view filename, std::string_view texture_filename, bool is_auto_rotation, bool is_inversed_z, double x_delta, double y_delta, double z_delta)
     : is_auto_rotation_(is_auto_rotation), texture_(texture_filename) {
     std::vector<geometry::Vector4d> texture_coords_;
     std::vector<geometry::Vector4d> normal_coords_;
@@ -96,7 +98,7 @@ load::Object3d::Object3d(std::string_view filename, std::string_view texture_fil
     }
 }
 
-load::Object3d::Texture::Texture(std::string_view texture_path) {
+model::Object3d::Texture::Texture(std::string_view texture_path) {
     sf::Image text;
     text.loadFromFile(texture_path.data());
     texture_map_ = rendering::Bitmap(text.getSize().x, text.getSize().y);
@@ -108,6 +110,6 @@ load::Object3d::Texture::Texture(std::string_view texture_path) {
     }
 }
 
-const rendering::Bitmap& load::Object3d::GetTexture() const {
+const rendering::Bitmap& model::Object3d::GetTexture() const {
     return texture_.texture_map_;
 }
