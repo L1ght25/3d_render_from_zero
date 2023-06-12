@@ -1,0 +1,10 @@
+cmake-build-debug
+*.o
+.idea
+**/.DS_Store
+build
+.cache
+compile_commands.json
+Release
+**/.*
+*make*
